@@ -36,35 +36,67 @@
     <div class="container mt-5">
         <h2 class="text-center mb-4">Register an Account</h2>
 
+        <!-- Form for user registration -->
         <form method="POST" action="{{ url_for('auth.register') }}">
-            <!-- Protect against CSRF attacks -->
+            <!-- CSRF protection -->
             {{ form.hidden_tag() }}
 
+            <!-- Full Name input -->
             <div class="mb-3">
                 <label for="name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                {{ form.name(class_="form-control", id="name", placeholder="Enter your full name") }}
+                {% if form.name.errors %}
+                    <div class="text-danger">
+                        {{ form.name.errors[0] }}
+                    </div>
+                {% endif %}
             </div>
 
+            <!-- Email input -->
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                {{ form.email(class_="form-control", id="email", placeholder="Enter your email") }}
+                {% if form.email.errors %}
+                    <div class="text-danger">
+                        {{ form.email.errors[0] }}
+                    </div>
+                {% endif %}
             </div>
 
+            <!-- Phone input -->
             <div class="mb-3">
                 <label for="phone" class="form-label">Phone Number</label>
-                <input type="tel" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
+                {{ form.phone(class_="form-control", id="phone", placeholder="Enter your phone number") }}
+                {% if form.phone.errors %}
+                    <div class="text-danger">
+                        {{ form.phone.errors[0] }}
+                    </div>
+                {% endif %}
             </div>
 
+            <!-- Password input -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                {{ form.password(class_="form-control", id="password", placeholder="Enter your password") }}
+                {% if form.password.errors %}
+                    <div class="text-danger">
+                        {{ form.password.errors[0] }}
+                    </div>
+                {% endif %}
             </div>
 
+            <!-- Confirm Password input -->
             <div class="mb-3">
                 <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                {{ form.confirm_password(class_="form-control", id="confirm_password", placeholder="Confirm your password") }}
+                {% if form.confirm_password.errors %}
+                    <div class="text-danger">
+                        {{ form.confirm_password.errors[0] }}
+                    </div>
+                {% endif %}
             </div>
 
+            <!-- Submit button -->
             <button type="submit" class="btn btn-primary w-100">Register</button>
         </form>
     </div>

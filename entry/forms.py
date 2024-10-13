@@ -4,9 +4,9 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Opt
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Full Names', validators=[DataRequired(), Length(min=2, max=20)])
+    name = StringField('Full Names', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    user_contact = StringField('Contact Number', validators=[DataRequired(),
+    phone = StringField('Contact Number', validators=[DataRequired(),
                                  Regexp(r'^[0-9]{10}$',
                                  message='Please enter a valid 10-digit phone number')])
     password = PasswordField('Password', validators=[DataRequired()])

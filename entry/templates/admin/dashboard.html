@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the Admin Dashboard</h1>
+
+    <ul>
+        <li>Total Products: {{ products_count }}</li>
+        <li>Total Categories: {{ categories_count }}</li>
+        <li>Total Users: {{ users_count }}</li>
+        <li>Total Wishlists: {{ wishlists_count }}</li>
+        <li>Total Carts: {{ carts_count }}</li>
+    </ul>
+
+    <a href="{{ url_for('admin.add_product') }}">Add New Product</a><br>
+    <a href="{{ url_for('admin.add_category') }}">Add New Category</a><br>
+    <a href="{{ url_for('admin.view_wishlists') }}">View User Wishlists</a><br>
+    <a href="{{ url_for('admin.view_carts') }}">View User Carts</a><br>
+    <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
+
+</body>
+</html>

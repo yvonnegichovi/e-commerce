@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Wishlists</title>
+</head>
+<body>
+    <h1>User Wishlists</h1>
+    <ul>
+        {% for wishlist in wishlists %}
+            <li>{{ wishlist.user.name }}'s wishlist: {{ wishlist.product.name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from entry.forms import RegistrationForm, LoginForm
 from entry.models import User
-from entry import app, db
+from entry import app, db, bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
+import logging
+from werkzeug.security import check_password_hash, generate_password_hash
 
 auth = Blueprint('auth', __name__)
 
@@ -19,8 +21,9 @@ def register():
             name=form.name.data,
             email=form.email.data,
             phone=form.phone.data,
-            password=generate_password_hash(form.password_hash.data)
+            password_hash=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         )
+        print('new account created')
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
@@ -33,14 +36,10 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('dashboard'))
-        flash('Invalid email or password', 'danger')
+            print("Login successful")
+            return redirect(url_for('product.dashboard'))
+        else:
+            flash('Invalid email or password', 'danger')
     return render_template('login.html', title='Login', form=form)
-
-
-@auth.route('/dashboard')
-@login_required
-def dashboard():
-    return render_template('dashboard.html', title='Dashboard')
