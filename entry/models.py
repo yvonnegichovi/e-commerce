@@ -79,6 +79,7 @@ class Product(db.Model):
     image = db.Column(db.String(255), nullable=True)  
     stock = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_starred = db.Column(db.Boolean, default=False)
 
 
 class Category(db.Model):

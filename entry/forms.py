@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateTimeField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateTimeField, FloatField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Optional, ValidationError
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 
 class RegistrationForm(FlaskForm):
@@ -34,3 +35,15 @@ class AdminRegisterForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', 
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
+
+
+class ProductForm(FlaskForm):
+    product_name = StringField('Product Name', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
+    price = FloatField('Price', validators=[DataRequired()])
+    description = TextAreaField('Description')
+    stock = IntegerField('Stock', default=0)
+    image = FileField('Product Image', validators=[
+        FileRequired(),
+        FileAllowed(['png', 'jpg', 'jpeg'], 'Images only!')
+    ])

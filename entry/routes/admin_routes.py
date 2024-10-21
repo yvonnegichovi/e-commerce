@@ -1,14 +1,24 @@
 from flask import render_template, redirect, url_for, flash, request, session
-from entry.forms import AdminRegisterForm, AdminLoginForm
+from entry.forms import AdminRegisterForm, AdminLoginForm, ProductForm
 from entry import db, app, bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
 from entry.models import Admin, Product, Category, User
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+from werkzeug.utils import secure_filename
 
 from flask import Blueprint
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
+
+UPLOAD_FOLDER = 'static/images/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @admin.route('register_admin', methods=['GET', 'POST'])
 def register_admin():
@@ -48,6 +58,7 @@ def admin_login():
         admin = Admin.query.filter_by(email=form.email.data).first()
         if admin and bcrypt.check_password_hash(admin.password_hash, form.password.data):
             login_user(admin, remember=form.remember.data)
+            print("YOU ARE OFFICIALLY LOGGED IN")
             flash('Successfully logged in as admin.', 'success')
             return redirect(url_for('admin.admin_dashboard'))
         else:
@@ -69,45 +80,47 @@ def admin_logout():
 @login_required
 @admin.route('/dashboard')
 def admin_dashboard():
-    if not session.get('admin_logged_in'):
-        flash('Please log in to access the admin dashboard.', 'danger')
-        return redirect(url_for('admin.admin_login'))
-    
-    # Fetch data for the dashboard
-    products_count = Product.query.count()
-    categories_count = Category.query.count()
-    users_count = User.query.count()
-    wishlists_count = Wishlist.query.count()
-    carts_count = Cart.query.count()
+    products =  Product.query.all()
+    starred_products = Product.query.filter_by(is_starred=True).all()
 
-    return render_template('admin/dashboard.html', 
-                           products_count=products_count,
-                           categories_count=categories_count,
-                           users_count=users_count,
-                           wishlists_count=wishlists_count,
-                           carts_count=carts_count)
+    return render_template('admin/dashboard.html', products=products, starred_products=starred_products)
+
 
 # Route to add new product
 @admin.route('/add_product', methods=['GET', 'POST'])
+@login_required
 def add_product():
-    if not session.get('admin_logged_in'):
-        flash('Please log in to add a product.', 'danger')
-        return redirect(url_for('admin.admin_login'))
+    form = ProductForm()
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        description = request.form.get('description')
-        price = request.form.get('price')
-        category_id = request.form.get('category_id')
+    if form.validate_on_submit():
+        product_name = form.product_name.data
+        category = form.category.data
+        price = form.priice.data
+        description = form.description.data
+        stock = form.stock.data
+        image = form.image.data
 
-        new_product = Product(name=name, description=description, price=price, category_id=category_id)
+        if image and allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(UPLOAD_FOLDER, filename)
+            image.save(image_path)
+        else:
+            image_path = None
+
+        new_product = Product(
+            product_name=product_name,
+            category=category,
+            price=price,
+            description=description,
+            stock=stock,
+            image=image_path
+        )
         db.session.add(new_product)
         db.session.commit()
-        flash('Product added successfully!', 'success')
-        return redirect(url_for('admin.admin_dashboard'))
 
-    categories = Category.query.all()
-    return render_template('admin/add_product.html', categories=categories)
+        flask('Product added successfuly!', 'success')
+        return redirect(url_for('admin.admin_dashboard'))
+    return render_template('admin/add_product.html', form=form)
 
 # Route to add new category
 @admin.route('/add_category', methods=['GET', 'POST'])

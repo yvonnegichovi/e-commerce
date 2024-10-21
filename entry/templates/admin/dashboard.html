@@ -4,23 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Welcome to the Admin Dashboard</h1>
 
-    <ul>
-        <li>Total Products: {{ products_count }}</li>
-        <li>Total Categories: {{ categories_count }}</li>
-        <li>Total Users: {{ users_count }}</li>
-        <li>Total Wishlists: {{ wishlists_count }}</li>
-        <li>Total Carts: {{ carts_count }}</li>
-    </ul>
+    <header>
+        <h1>Welcome to the Admin Dashboard, {{ current_user.username }}!</h1>
+    </header>
 
-    <a href="{{ url_for('admin.add_product') }}">Add New Product</a><br>
-    <a href="{{ url_for('admin.add_category') }}">Add New Category</a><br>
-    <a href="{{ url_for('admin.view_wishlists') }}">View User Wishlists</a><br>
-    <a href="{{ url_for('admin.view_carts') }}">View User Carts</a><br>
-    <a href="{{ url_for('admin.admin_logout') }}">Logout</a>
+    <section class="admin-actions">
+        <button onclick="window.location.href='{{ url_for('admin.add_product') }}'">Add Product</button>
+        <button onclick="window.location.href='#'">Edit Product</button>
+        <button onclick="window.location.href='#">Delete Product</button>
+        <button onclick="window.location.href='#'">Add Category</button>
+        <button onclick="window.location.href='#'">Edit Category</button>
+        <button onclick="window.location.href='#'">Delete Category</button>
+    </section>
+
+    <section class="starred-products">
+        <h2>Starred Products</h2>
+        {% if starred_products %}
+            <ul>
+                {% for product in starred_products %}
+                    <li>{{ product.product_name }} - ${{ product.price }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No starred products available.</p>
+        {% endif %}
+    </section>
+
+    <section class="all-products">
+        <h2>All Products</h2>
+        {% if products %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ product.id }}</td>
+                            <td>{{ product.product_name }}</td>
+                            <td>{{ product.category }}</td>
+                            <td>${{ product.price }}</td>
+                            <td>{{ product.stock }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No products available.</p>
+        {% endif %}
+    </section>
 
 </body>
 </html>
