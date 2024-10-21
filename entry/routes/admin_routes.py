@@ -1,31 +1,64 @@
 from flask import render_template, redirect, url_for, flash, request, session
-from entry import db, app
-from entry.models import Admin, Product, Category, User, Wishlist, Cart
+from entry.forms import AdminRegisterForm, AdminLoginForm
+from entry import db, app, bcrypt
+from flask_login import login_user, logout_user, login_required, current_user
+import logging
+from entry.models import Admin, Product, Category, User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import Blueprint
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
+@admin.route('register_admin', methods=['GET', 'POST'])
+def register_admin():
+    form = AdminRegisterForm()
+    if form.validate_on_submit():
+        existing_admin = Admin.query.filter_by(email=form.email.data).first()
+        if existing_admin:
+            flash('Email address already exists', 'danger')
+            return redirect(url_for('admin.register_admin'))
+        new_admin = Admin(
+            username = form.username.data,
+            email = form.email.data,
+            password_hash=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        )
+
+        """if password != confirm_password:
+            flash('Passwords do not match!', 'danger')
+            return redirect(url_for('admin.register_admin'))"""
+
+        try:
+            db.session.add(new_admin)
+            db.session.commit()
+            flash('Admin account created successfully!', 'success')
+            return redirect(url_for('admin.admin_login'))
+        except:
+            db.session.rollback()
+            flash('An error occurred while creating the admin account.', 'danger')
+
+    return render_template('admin/register_admin.html', form=form)
+
 # Admin login route
 @admin.route('/login', methods=['GET', 'POST'])
 def admin_login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-
+    form = AdminLoginForm()
+    if form.validate_on_submit():
         # Verify admin credentials
-        admin = Admin.query.filter_by(username=username).first()
-        if admin and check_password_hash(admin.password_hash, password):
-            session['admin_logged_in'] = True
+        admin = Admin.query.filter_by(email=form.email.data).first()
+        if admin and bcrypt.check_password_hash(admin.password_hash, form.password.data):
+            login_user(admin, remember=form.remember.data)
             flash('Successfully logged in as admin.', 'success')
             return redirect(url_for('admin.admin_dashboard'))
         else:
+            print("COULD NOT LOGIN FOR SOME REASON")
             flash('Invalid credentials, please try again.', 'danger')
+            return redirect(url_for('admin.admin_login'))
 
-    return render_template('admin/login.html')
+    return render_template('admin/login.html', title='Admin Login', form=form)
 
 # Admin logout route
+@login_required
 @admin.route('/logout')
 def admin_logout():
     session.pop('admin_logged_in', None)
@@ -33,6 +66,7 @@ def admin_logout():
     return redirect(url_for('admin.admin_login'))
 
 # Admin dashboard route
+@login_required
 @admin.route('/dashboard')
 def admin_dashboard():
     if not session.get('admin_logged_in'):

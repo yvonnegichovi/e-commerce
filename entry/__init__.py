@@ -33,6 +33,6 @@ app.register_blueprint(admin)
 from entry.models import User
 from entry.models import Product
 from entry.models import Category
-from entry.models import Wishlist
-from entry.models import Cart
+"""from entry.models import Wishlist
+from entry.models import Cart"""
 from entry.models import Admin

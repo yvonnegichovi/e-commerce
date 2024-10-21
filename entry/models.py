@@ -19,7 +19,7 @@ def load_user(user_id):
         return None
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = db.Column(db.String(100), nullable=False)
@@ -28,8 +28,16 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    wishlists = db.relationship('Wishlist', back_populates='user', cascade="all, delete-orphan")
-    carts = db.relationship('Cart', back_populates='user', cascade="all, delete-orphan")
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    def get_id(self):
+        return str(self.id)
 
 
     def __str__(self):
@@ -40,7 +48,19 @@ class Admin(db.Model):
     __tablename__ = 'admin'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+    def get_id(self):
+        return str(self.id)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -53,8 +73,10 @@ class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     product_name = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), unique=True, nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
+    image = db.Column(db.String(255), nullable=True)  
     stock = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -62,23 +84,3 @@ class Product(db.Model):
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-
-
-class Wishlist(db.Model):
-    __tablename__ = 'wishlist'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-
-    user = db.relationship('User', back_populates='wishlists')
-
-class Cart(db.Model):
-    __tablename__ = 'cart'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-
-    user = db.relationship('User', back_populates='carts')
-
-    def __repr__(self):
-        return f"<Cart {self.id}: User {self.user_id}, Product {self.product_id}, Quantity {self.quantity}>"
