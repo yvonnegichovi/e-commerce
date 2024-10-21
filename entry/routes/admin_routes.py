@@ -87,42 +87,47 @@ def admin_dashboard():
 
 
 # Route to add new product
-@admin.route('/add_product', methods=['GET', 'POST'])
 @login_required
+@admin.route('/add_product', methods=['POST'])
 def add_product():
     form = ProductForm()
 
     if form.validate_on_submit():
+        # Retrieve form data
         product_name = form.product_name.data
-        category = form.category.data
-        price = form.priice.data
         description = form.description.data
+        price = form.price.data
         stock = form.stock.data
-        image = form.image.data
+        is_starred = form.is_starred.data
 
-        if image and allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image_path = os.path.join(UPLOAD_FOLDER, filename)
-            image.save(image_path)
-        else:
-            image_path = None
+        # Handle image upload
+        image_file = form.image.data
+        if image_file and allowed_file(image_file.filename):
+            filename = secure_filename(image_file.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(image_path)  # Save the uploaded image to the upload folder
 
+        # Create new product instance
         new_product = Product(
             product_name=product_name,
-            category=category,
-            price=price,
             description=description,
+            price=price,
             stock=stock,
-            image=image_path
+            image=filename,  # Store image filename in the database
+            is_starred=is_starred
         )
+
+        # Add and commit to the database
         db.session.add(new_product)
         db.session.commit()
 
-        flask('Product added successfuly!', 'success')
-        return redirect(url_for('admin.admin_dashboard'))
+        flash('Product added successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+
     return render_template('admin/add_product.html', form=form)
 
 # Route to add new category
+@login_required
 @admin.route('/add_category', methods=['GET', 'POST'])
 def add_category():
     if not session.get('admin_logged_in'):
@@ -136,8 +141,34 @@ def add_category():
         db.session.commit()
         flash('Category added successfully!', 'success')
         return redirect(url_for('admin.admin_dashboard'))
-
     return render_template('admin/add_category.html')
+
+
+@login_required
+@admin.route('/admin/edit-product')
+def edit_product():
+    # Logic for editing product
+    return render_template('edit_product.html')
+
+
+@login_required
+@admin.route('/admin/delete-product')
+def delete_product():
+    # Logic for deleting product
+    return redirect(url_for('admin.admin_dashboard'))
+
+
+@login_required
+@admin.route('/admin/edit-category')
+def edit_category():
+    # Logic for editing product
+    return render_template('edit_category.html')
+
+@login_required
+@admin.route('/admin/delete-category')
+def delete_category():
+    # Logic for deleting product
+    return redirect(url_for('admin.admin_dashboard'))
 
 # Route to view user wishlists
 @admin.route('/view_wishlists')

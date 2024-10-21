@@ -47,3 +47,4 @@ class ProductForm(FlaskForm):
         FileRequired(),
         FileAllowed(['png', 'jpg', 'jpeg'], 'Images only!')
     ])
+    is_starred = BooleanField('Starred Product')
