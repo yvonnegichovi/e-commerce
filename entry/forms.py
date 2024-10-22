@@ -45,3 +45,7 @@ class ProductForm(FlaskForm):
     stock = IntegerField('Stock', validators=[DataRequired()])
     image = FileField('Product Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     is_starred = BooleanField('Starred Product')
+
+
+class CategoryForm(FlaskForm):
+    name = StringField('Category Name', validators=[DataRequired()])

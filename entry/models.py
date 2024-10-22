@@ -73,7 +73,6 @@ class Product(db.Model):
     __tablename__ = 'products'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     product_name = db.Column(db.String(100), nullable=False)
-    category = db.Column(db.String(100), unique=False, nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
     image = db.Column(db.String(255), nullable=True)  
@@ -81,7 +80,20 @@ class Product(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_starred = db.Column(db.Boolean, default=False)
 
+    # Foreign key to Category
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+
+    def __repr__(self):
+        return f"<Product {self.product_name}>"
+
 
 class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'categories'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(100), unique=True, nullable=False)
+
+    # One-to-many relationship with Product
+    products = db.relationship('Product', backref='category', lazy=True)
+
+    def __repr__(self):
+        return f"<Category {self.name}>"

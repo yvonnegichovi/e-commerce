@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, flash, request, session
-from entry.forms import AdminRegisterForm, AdminLoginForm, ProductForm
+from entry.forms import AdminRegisterForm, AdminLoginForm, ProductForm, CategoryForm
 from entry import db, app, bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
 import logging
@@ -149,18 +149,21 @@ def add_product():
 @login_required
 @admin.route('/add_category', methods=['GET', 'POST'])
 def add_category():
-    if not session.get('admin_logged_in'):
-        flash('Please log in to add a category.', 'danger')
-        return redirect(url_for('admin.admin_login'))
+    form = CategoryForm()
+    if form.validate_on_submit():
+        try:
+            # Create new category object from form data
+            new_category = Category(name=form.name.data.strip())
+            # Add to the database session and commit
+            db.session.add(new_category)
+            db.session.commit()
+            flash(f"Category '{new_category.name}' added successfully!", 'success')
+            return redirect(url_for('admin.add_category'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error adding category: {str(e)}", 'error')
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        new_category = Category(name=name)
-        db.session.add(new_category)
-        db.session.commit()
-        flash('Category added successfully!', 'success')
-        return redirect(url_for('admin.admin_dashboard'))
-    return render_template('admin/add_category.html')
+    return render_template('admin/add_category.html', form=form)
 
 
 @login_required
