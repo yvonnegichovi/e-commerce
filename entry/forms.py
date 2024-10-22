@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateTimeField, FloatField, IntegerField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Optional, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateTimeField, FloatField, IntegerField, DecimalField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Optional, ValidationError, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 
 
@@ -39,12 +39,9 @@ class AdminRegisterForm(FlaskForm):
 
 class ProductForm(FlaskForm):
     product_name = StringField('Product Name', validators=[DataRequired()])
-    category = StringField('Category', validators=[DataRequired()])
-    price = FloatField('Price', validators=[DataRequired()])
+    category = SelectField('Category', choices=[('electronics', 'Electronics'), ('beauty', 'Beauty'), ('clothing', 'Clothing')], validators=[DataRequired()])
+    price = DecimalField('Price (KES)', validators=[DataRequired()])
     description = TextAreaField('Description')
-    stock = IntegerField('Stock', default=0)
-    image = FileField('Product Image', validators=[
-        FileRequired(),
-        FileAllowed(['png', 'jpg', 'jpeg'], 'Images only!')
-    ])
+    stock = IntegerField('Stock', validators=[DataRequired()])
+    image = FileField('Product Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     is_starred = BooleanField('Starred Product')

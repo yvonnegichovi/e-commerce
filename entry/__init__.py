@@ -4,10 +4,23 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+import os
 
 load_dotenv()
 
 app = Flask(__name__)
+
+# Define the path where you want to save uploaded files
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # This will create an 'uploads' directory in your project folder
+
+# Add the upload folder to the app's configuration
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure the 'uploads' directory exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+
 
 from config import Config
 app.config.from_object(Config)

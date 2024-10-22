@@ -40,10 +40,10 @@
     <!-- Main Content -->
     <div class="container mt-5">
         <h2 class="text-center">Add New Product</h2>
-        
+
         <form action="{{ url_for('admin.add_product') }}" method="POST" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
-            
+
             <!-- Product Name -->
             <div class="mb-3">
                 {{ form.product_name.label(class="form-label") }}
@@ -56,10 +56,19 @@
                 {{ form.description(class="form-control") }}
             </div>
 
-            <!-- Price -->
+            <!-- Category -->
+            <div class="mb-3">
+                {{ form.category.label(class="form-label") }}
+                {{ form.category(class="form-select") }}
+            </div>
+
+            <!-- Price with KES -->
             <div class="mb-3">
                 {{ form.price.label(class="form-label") }}
-                {{ form.price(class="form-control") }}
+                <div class="input-group">
+                    {{ form.price(class="form-control") }}
+                    <span class="input-group-text">KES</span>
+                </div>
             </div>
 
             <!-- Stock -->
@@ -68,10 +77,14 @@
                 {{ form.stock(class="form-control") }}
             </div>
 
-            <!-- Image Upload -->
+            <!-- Image Upload with Drag-and-Drop -->
             <div class="mb-3">
                 {{ form.image.label(class="form-label") }}
-                {{ form.image(class="form-control") }}
+                <div class="drop-zone" id="drop-zone">
+                    <span>Drag & Drop your image here or click to upload</span>
+                    <input type="file" name="image" id="image-input" class="form-control" style="display:none;">
+                    <img id="preview-image" src="#" alt="Preview" style="display:none;">
+                </div>
             </div>
 
             <!-- Starred Checkbox -->
@@ -92,5 +105,60 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Drag and Drop functionality for image upload
+        const dropZone = document.getElementById('drop-zone');
+        const imageInput = document.getElementById('image-input');
+        const previewImage = document.getElementById('preview-image');
+
+        dropZone.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', () => {
+            if (imageInput.files.length > 0) {
+                const file = imageInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    dropZone.style.border = '2px solid #007bff';
+                    dropZone.querySelector('span').style.display = 'none';
+                }
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragging');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imageInput.files = files;
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    dropZone.style.border = '2px solid #007bff';
+                    dropZone.querySelector('span').style.display = 'none';
+                }
+
+                reader.readAsDataURL(files[0]);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -7,13 +7,18 @@ from entry.models import Admin, Product, Category, User
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from werkzeug.utils import secure_filename
+import os
 
 from flask import Blueprint
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
-UPLOAD_FOLDER = 'static/images/'
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+# Set of allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+# Add it to your app configuration if necessary
+app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+
 
 
 def allowed_file(filename):
@@ -88,14 +93,16 @@ def admin_dashboard():
 
 # Route to add new product
 @login_required
-@admin.route('/add_product', methods=['POST'])
+@admin.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     form = ProductForm()
 
     if form.validate_on_submit():
+        print("FORM VALIDATED SUCCESSFULLY.....")
         # Retrieve form data
         product_name = form.product_name.data
         description = form.description.data
+        category = form.category.data
         price = form.price.data
         stock = form.stock.data
         is_starred = form.is_starred.data
@@ -111,6 +118,7 @@ def add_product():
         new_product = Product(
             product_name=product_name,
             description=description,
+            category=category,
             price=price,
             stock=stock,
             image=filename,  # Store image filename in the database
@@ -118,11 +126,22 @@ def add_product():
         )
 
         # Add and commit to the database
-        db.session.add(new_product)
-        db.session.commit()
+        try:
+            # Add and commit to the database
+            db.session.add(new_product)
+            db.session.commit()
+            flash('Product added successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()  # Rollback in case of error
+            print(f"Error saving product to the database: {e}")
+            flash('There was an error adding the product. Please try again.', 'danger')
 
-        flash('Product added successfully!', 'success')
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
+
+    else:
+        # Debugging - print any form validation errors
+        print("Form did not validate.")
+        print(form.errors)
 
     return render_template('admin/add_product.html', form=form)
 
