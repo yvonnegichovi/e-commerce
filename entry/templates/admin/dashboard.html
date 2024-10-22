@@ -53,8 +53,9 @@
                             <img src="{{ product.image_url or 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.product_name }}</h5>
+                                <p class="card-text">{{ product.image }}</p>
                                 <p class="card-text">{{ product.description }}</p>
-                                <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                                <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                             </div>
                         </div>
@@ -75,8 +76,9 @@
                             <img src="{{ product.image_url or 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.product_name }}</h5>
+                                <p class="card-text">{{ product.image }}</p>
                                 <p class="card-text">{{ product.description }}</p>
-                                <p class="card-text"><strong>Price:</strong> ${{ product.price }}</p>
+                                <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                             </div>
                         </div>
