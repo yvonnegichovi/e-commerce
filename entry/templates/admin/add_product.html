@@ -56,10 +56,15 @@
                 {{ form.description(class="form-control") }}
             </div>
 
-            <!-- Category -->
+            <!-- Category Dropdown -->
             <div class="mb-3">
-                {{ form.category.label(class="form-label") }}
-                {{ form.category(class="form-select") }}
+                <label for="category" class="form-label">Category</label>
+                <select name="category" id="category" class="form-select" required>
+                    <option value="">Select a Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
 
             <!-- Price with KES -->

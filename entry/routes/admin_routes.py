@@ -97,12 +97,14 @@ def admin_dashboard():
 def add_product():
     form = ProductForm()
 
+    categories = Category.query.all()
+
     if form.validate_on_submit():
         print("FORM VALIDATED SUCCESSFULLY.....")
         # Retrieve form data
         product_name = form.product_name.data
         description = form.description.data
-        category = form.category.data
+        category_id = form.category.data
         price = form.price.data
         stock = form.stock.data
         is_starred = form.is_starred.data
@@ -114,14 +116,18 @@ def add_product():
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image_file.save(image_path)  # Save the uploaded image to the upload folder
 
+            image_url = os.path.join('static/uploads', filename)  # Relative URL for the image
+        else:
+            image_url = None  # Handle case where no image is uploaded
+
         # Create new product instance
         new_product = Product(
             product_name=product_name,
             description=description,
-            category=category,
+            category_id=category_id,
             price=price,
             stock=stock,
-            image=filename,  # Store image filename in the database
+            image=image_url,  # Store image filename in the database
             is_starred=is_starred
         )
 
@@ -143,7 +149,7 @@ def add_product():
         print("Form did not validate.")
         print(form.errors)
 
-    return render_template('admin/add_product.html', form=form)
+    return render_template('admin/add_product.html', form=form, categories=categories)
 
 # Route to add new category
 @login_required
@@ -158,7 +164,7 @@ def add_category():
             db.session.add(new_category)
             db.session.commit()
             flash(f"Category '{new_category.name}' added successfully!", 'success')
-            return redirect(url_for('admin.add_category'))
+            return redirect(url_for('admin.admin_dashboard'))
         except Exception as e:
             db.session.rollback()
             flash(f"Error adding category: {str(e)}", 'error')

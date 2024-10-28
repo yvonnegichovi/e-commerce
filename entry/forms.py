@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateTimeField, FloatField, IntegerField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Regexp, Optional, ValidationError, NumberRange
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from entry.models import Category
 
 
 class RegistrationForm(FlaskForm):
@@ -39,12 +40,17 @@ class AdminRegisterForm(FlaskForm):
 
 class ProductForm(FlaskForm):
     product_name = StringField('Product Name', validators=[DataRequired()])
-    category = SelectField('Category', choices=[('electronics', 'Electronics'), ('beauty', 'Beauty'), ('clothing', 'Clothing')], validators=[DataRequired()])
+    category = SelectField('Category', coerce=int, choices=[])
     price = DecimalField('Price (KES)', validators=[DataRequired()])
     description = TextAreaField('Description')
     stock = IntegerField('Stock', validators=[DataRequired()])
     image = FileField('Product Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     is_starred = BooleanField('Starred Product')
+
+    def __init__(self, *args, **kwargs):
+        super(ProductForm, self).__init__(*args, **kwargs)
+        # Fetch categories only when the form is created
+        self.category.choices = [(c.id, c.name) for c in Category.query.all()]
 
 
 class CategoryForm(FlaskForm):

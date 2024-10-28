@@ -11,7 +11,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Define the path where you want to save uploaded files
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # This will create an 'uploads' directory in your project folder
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static/uploads')  # Ensure this path points to static/uploads
 
 # Add the upload folder to the app's configuration
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -19,8 +19,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Ensure the 'uploads' directory exists
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-
 
 from config import Config
 app.config.from_object(Config)
