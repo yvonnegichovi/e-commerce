@@ -12,4 +12,6 @@ product = Blueprint('product', __name__)
 @product.route('/dashboard')
 def dashboard():
     products = Product.query.all()
-    return render_template('dashboard.html', products=products)
+    starred_products = Product.query.filter_by(is_starred=True).all()
+
+    return render_template('dashboard.html', products=products, starred_products=starred_products)
