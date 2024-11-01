@@ -65,7 +65,7 @@ def admin_login():
             login_user(admin, remember=form.remember.data)
             print("YOU ARE OFFICIALLY LOGGED IN")
             flash('Successfully logged in as admin.', 'success')
-            return redirect(url_for('admin.admin_dashboard'))
+            return redirect(url_for('admin.dashboard'))
         else:
             print("COULD NOT LOGIN FOR SOME REASON")
             flash('Invalid credentials, please try again.', 'danger')
@@ -149,7 +149,7 @@ def add_product():
             print(f"Error saving product to the database: {e}")
             flash('There was an error adding the product. Please try again.', 'danger')
 
-        return redirect(url_for('admin.admin_dashboard'))
+        return redirect(url_for('admin.dashboard'))
 
     else:
         # Debugging - print any form validation errors
@@ -172,7 +172,7 @@ def add_category():
             db.session.add(new_category)
             db.session.commit()
             flash(f"Category '{new_category.name}' added successfully!", 'success')
-            return redirect(url_for('admin.admin_dashboard'))
+            return redirect(url_for('admin.dashboard'))
         except Exception as e:
             db.session.rollback()
             flash(f"Error adding category: {str(e)}", 'error')
@@ -193,6 +193,9 @@ def edit_product(product_id):
         product.price = request.form['price']
         product.stock = request.form['stock']
 
+        # Update is_starred status
+        product.is_starred = 'is_starred' in request.form
+
         # Handle image upload if a new image is provided
         if 'image' in request.files and request.files['image'].filename != '':
             file = request.files['image']
@@ -208,7 +211,7 @@ def edit_product(product_id):
         # Save the updated product to the database
         db.session.commit()
         flash('Product updated successfully!', 'success')
-        return redirect(url_for('admin.admin_dashboard'))  # Redirect to the dashboard after updating
+        return redirect(url_for('admin.dashboard'))  # Redirect to the dashboard after updating
 
     # Render the edit form with the current product details
     return render_template('admin/edit_product.html', product=product)
@@ -239,7 +242,7 @@ def edit_category():
 @admin.route('/admin/delete-category')
 def delete_category():
     # Logic for deleting product
-    return redirect(url_for('admin.admin_dashboard'))
+    return redirect(url_for('admin.dashboard'))
 
 # Route to view user wishlists
 @admin.route('/view_wishlists')

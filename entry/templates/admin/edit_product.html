@@ -28,6 +28,12 @@
                 <input type="number" class="form-control" id="stock" name="stock" value="{{ product.stock }}" required>
             </div>
 
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="is_starred" name="is_starred" {% if product.is_starred %}checked{% endif %}>
+                <label class="form-check-label" for="is_starred">Star this product</label>
+            </div>
+
+
             <!-- Display current image -->
             <div class="mb-3">
                 <label for="current_image" class="form-label">Current Image</label><br>
