@@ -75,13 +75,23 @@ class Product(db.Model):
     product_name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
+    more_details = db.Column(db.String(1000), nullable=True)
     image = db.Column(db.String(255), nullable=True)  
     stock = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_starred = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(20), nullable=False, default='unordered')
 
     # Foreign key to Category
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+
+    def __init__(self, product_name, description, more_details, price, stock, image):
+        self.product_name = product_name
+        self.description = description
+        self.more_details = more_details
+        self.price = price
+        self.stock = stock
+        self.image = image
 
     def __repr__(self):
         return f"<Product {self.product_name}>"

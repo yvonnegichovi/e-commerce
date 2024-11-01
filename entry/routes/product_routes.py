@@ -15,3 +15,13 @@ def dashboard():
     starred_products = Product.query.filter_by(is_starred=True).all()
 
     return render_template('dashboard.html', products=products, starred_products=starred_products)
+
+
+@product.route('/product/<int:productt_id>')
+def product_detail(product_id):
+    # Retrieve the prodduct from the database by ID
+    product = Product.query.get_or_404(product_id)
+    return render_template('product_detail.html', product=product)
+
+# Adds to the cart
+

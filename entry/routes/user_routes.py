@@ -43,3 +43,13 @@ def login():
         else:
             flash('Invalid email or password', 'danger')
     return render_template('login.html', title='Login', form=form)
+
+# User logout route
+@login_required
+@auth.route('/logout')
+def logout():
+    session.clear()
+
+    flash('You have successfully logged out.', 'sucess')
+
+    return redirect(url_for('auth.login'))
