@@ -52,8 +52,8 @@
             <h2 class="text-center mb-4">Starred Products</h2>
             {% if starred_products %}
                 {% for product in starred_products %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
+                    <div class="col-md-2 mb-4">
+                        <div class="card h-80">
                             <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
                                 class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
@@ -79,8 +79,8 @@
             <h2 class="text-center mb-4">All Products</h2>
             {% if products %}
                 {% for product in products %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
+                    <div class="col-md-2 mb-4">
+                        <div class="card h-80">
                             <img src="{{ url_for('static', filename=product.image) if product.image else 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.product_name }}</h5>
