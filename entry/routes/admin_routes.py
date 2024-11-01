@@ -84,11 +84,18 @@ def admin_logout():
 # Admin dashboard route
 @login_required
 @admin.route('/dashboard')
-def admin_dashboard():
+def dashboard():
+    return render_template('admin/dashboard.html')
+
+
+# List all products
+@login_required
+@admin.route('/products', methods=['GET'])
+def list_products():
     products =  Product.query.all()
     starred_products = Product.query.filter_by(is_starred=True).all()
 
-    return render_template('admin/dashboard.html', products=products, starred_products=starred_products)
+    return render_template('admin/list.html', products=products, starred_products=starred_products)
 
 
 # Route to add new product
@@ -208,10 +215,18 @@ def edit_product(product_id):
 
 
 @login_required
-@admin.route('/admin/delete-product')
-def delete_product():
-    # Logic for deleting product
-    return redirect(url_for('admin.admin_dashboard'))
+@admin.route('/delete-product/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    product = Product.query.get(product_id)
+
+    if product:
+        db.session.delete(product)
+        db.session.commit()
+        flash('Product deleted successfully!', 'success')
+    else:
+        flash('Product not found.', 'danger')
+
+    return redirect(url_for('admin.dashboard'))
 
 
 @login_required
