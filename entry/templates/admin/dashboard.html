@@ -36,7 +36,6 @@
         <!-- Action Buttons -->
         <div class="text-center mb-5">
             <a class="btn btn-primary" href="{{ url_for('admin.add_product') }}">Add Product</a>
-            <a class="btn btn-secondary" href="{{ url_for('admin.edit_product') }}">Edit Product</a>
             <a class="btn btn-danger" href="{{ url_for('admin.delete_product') }}">Delete Product</a>
             <a class="btn btn-info" href="{{ url_for('admin.add_category') }}">Add Category</a>
             <a class="btn btn-warning" href="{{ url_for('admin.edit_category') }}">Edit Category</a>
@@ -50,12 +49,15 @@
                 {% for product in starred_products %}
                     <div class="col-md-4 mb-4">
                         <div class="card h-100">
-                            <img src="{{ url_for('static', filename=product.image) if product.image else 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ product.product_name }}">
+                            <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
+                                class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ product.product_name }}</h5>
                                 <p class="card-text">{{ product.description }}</p>
                                 <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
+                                <!-- Edit button specific to each product -->
+                                <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-secondary">Edit Product</a>
                             </div>
                         </div>
                     </div>
@@ -78,6 +80,8 @@
                                 <p class="card-text">{{ product.description }}</p>
                                 <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
+                                <!-- Edit button specific to each product -->
+                                <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-secondary">Edit Product</a>
                             </div>
                         </div>
                     </div>
@@ -100,4 +104,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

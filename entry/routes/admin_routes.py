@@ -151,6 +151,7 @@ def add_product():
 
     return render_template('admin/add_product.html', form=form, categories=categories)
 
+
 # Route to add new category
 @login_required
 @admin.route('/add_category', methods=['GET', 'POST'])
@@ -173,10 +174,37 @@ def add_category():
 
 
 @login_required
-@admin.route('/admin/edit-product')
-def edit_product():
-    # Logic for editing product
-    return render_template('edit_product.html')
+@admin.route('/admin/edit-product/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    # Retrieve the product from the database
+    product = Product.query.get_or_404(product_id)
+
+    if request.method == 'POST':
+        # Update product details
+        product.product_name = request.form['product_name']
+        product.description = request.form['description']
+        product.price = request.form['price']
+        product.stock = request.form['stock']
+
+        # Handle image upload if a new image is provided
+        if 'image' in request.files and request.files['image'].filename != '':
+            file = request.files['image']
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            # Save the new image
+            file.save(file_path)
+
+            # Update the product image path
+            product.image = f'uploads/{filename}'  # Save relative path
+
+        # Save the updated product to the database
+        db.session.commit()
+        flash('Product updated successfully!', 'success')
+        return redirect(url_for('admin.admin_dashboard'))  # Redirect to the dashboard after updating
+
+    # Render the edit form with the current product details
+    return render_template('admin/edit_product.html', product=product)
 
 
 @login_required
