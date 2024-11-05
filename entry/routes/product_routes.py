@@ -21,7 +21,8 @@ def dashboard():
 def product_detail(product_id):
     # Retrieve the prodduct from the database by ID
     product = Product.query.get_or_404(product_id)
-    return render_template('products/product_detail.html', product=product)
+    category_products = Product.query.filter_by(category_id=product.category_id).filter(Product.id != product_id).limit(5).all()
+    return render_template('products/product_detail.html', category_products=category_products, product=product)
 
 # Adds to the cart
 
