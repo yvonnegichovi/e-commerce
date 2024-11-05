@@ -205,7 +205,7 @@ def edit_product(product_id):
         # Save the updated product to the database
         db.session.commit()
         flash('Product updated successfully!', 'success')
-        return redirect(url_for('admin.dashboard'))  # Redirect to the dashboard after updating
+        return redirect(url_for('admin.list_products'))  # Redirect to the dashboard after updating
 
     # Render the edit form with the current product details
     return render_template('admin/edit_product.html', product=product)
@@ -223,20 +223,58 @@ def delete_product(product_id):
     else:
         flash('Product not found.', 'danger')
 
-    return redirect(url_for('admin.dashboard'))
+    return redirect(url_for('admin.list_products'))
 
 
 @login_required
-@admin.route('/admin/edit-category')
-def edit_category():
-    # Logic for editing product
-    return render_template('edit_category.html')
+@admin.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
+def edit_category(category_id):
+    """
+    Editing a category
+    """
+    category = Category.query.get_or_404(category_id)
+
+    if request.method == 'POST':
+        """
+        Update category details from the form
+        """
+        category.name = request.form.get('name')
+        category.description = request.form.get('description')
+
+        """Commit updates to the database"""
+        try:
+            db.session.commit()
+            flash('Category updated successfully!', 'success')
+            return redirect(url_for('admin.list_categories'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error updating the category. Please try again', 'danger')
+    return render_template('admin/edit_category.html', category=category)
 
 @login_required
-@admin.route('/admin/delete-category')
-def delete_category():
-    # Logic for deleting product
-    return redirect(url_for('admin.dashboard'))
+@admin.route('/delete-category/<int:category_id>', methods=['POST'])
+def delete_category(category_id):
+    """
+    Deletes a category
+    """
+    category = Category.query.get(category_id)
+    if category:
+        db.session.delete(category)
+        db.session.commit()
+        flash('Category successfully deleted', 'success')
+    else:
+        flash('Could not find the category', 'danger')
+    return redirect(url_for('admin.list_categories'))
+
+
+@login_required
+@admin.route('/categories')
+def list_categories():
+    """
+    Lists the categories lists
+    """
+    categories = Category.query.all()
+    return render_template('admin/categories_list.html', categories=categories)
 
 # Route to view user wishlists
 @admin.route('/view_wishlists')

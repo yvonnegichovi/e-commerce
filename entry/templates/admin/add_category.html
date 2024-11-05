@@ -19,6 +19,11 @@
     <div class="container mt-5">
         <h2 class="text-center">Add New Category</h2>
 
+        <!-- Back to Dashboard Button -->
+        <div class="mb-4">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+
         <form action="{{ url_for('admin.add_category') }}" method="POST">
             {{ form.hidden_tag() }}
 
