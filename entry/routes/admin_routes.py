@@ -111,6 +111,7 @@ def add_product():
         # Retrieve form data
         product_name = form.product_name.data
         description = form.description.data
+        more_details = form.more_details.data
         category_id = form.category.data
         price = form.price.data
         stock = form.stock.data
@@ -131,6 +132,7 @@ def add_product():
         new_product = Product(
             product_name=product_name,
             description=description,
+            more_details=more_details,
             category_id=category_id,
             price=price,
             stock=stock,
@@ -190,6 +192,7 @@ def edit_product(product_id):
         # Update product details
         product.product_name = request.form['product_name']
         product.description = request.form['description']
+        product.more_details= request.form['more_details']
         product.price = request.form['price']
         product.stock = request.form['stock']
 

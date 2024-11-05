@@ -85,14 +85,6 @@ class Product(db.Model):
     # Foreign key to Category
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
-    def __init__(self, product_name, description, more_details, price, stock, image):
-        self.product_name = product_name
-        self.description = description
-        self.more_details = more_details
-        self.price = price
-        self.stock = stock
-        self.image = image
-
     def __repr__(self):
         return f"<Product {self.product_name}>"
 

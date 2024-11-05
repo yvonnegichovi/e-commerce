@@ -43,6 +43,7 @@ class ProductForm(FlaskForm):
     category = SelectField('Category', coerce=int, choices=[])
     price = DecimalField('Price (KES)', validators=[DataRequired()])
     description = TextAreaField('Description')
+    more_details = TextAreaField('More Details')
     stock = IntegerField('Stock', validators=[DataRequired()])
     image = FileField('Product Image', validators=[FileAllowed(['jpg', 'png', 'jpeg', 'gif'])])
     is_starred = BooleanField('Starred Product')

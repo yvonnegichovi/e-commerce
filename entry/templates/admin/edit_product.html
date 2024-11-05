@@ -20,6 +20,10 @@
                 <textarea class="form-control" id="description" name="description" required>{{ product.description }}</textarea>
             </div>
             <div class="mb-3">
+                <label for="more_details" class="form-label">More Details</label>
+                <textarea class="form-control" id="more_details" name="more_details" required>{{ product.more_details }}</textarea>
+            </div>
+            <div class="mb-3">
                 <label for="price" class="form-label">Price (Ksh)</label>
                 <input type="number" class="form-control" id="price" name="price" value="{{ product.price }}" required>
             </div>
