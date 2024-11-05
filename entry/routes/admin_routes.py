@@ -102,29 +102,27 @@ def list_products():
 @login_required
 @admin.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    form = ProductForm()
-
     categories = Category.query.all()
 
-    if form.validate_on_submit():
-        print("FORM VALIDATED SUCCESSFULLY.....")
-        # Retrieve form data
-        product_name = form.product_name.data
-        description = form.description.data
-        more_details = form.more_details.data
-        category_id = form.category.data
-        price = form.price.data
-        stock = form.stock.data
-        is_starred = form.is_starred.data
+    # Check if it's a POST request
+    if request.method == 'POST':
+        # Retrieve form data directly from request
+        product_name = request.form.get('product_name')
+        description = request.form.get('description')
+        more_details = request.form.get('more_details')
+        category_id = request.form.get('category')
+        price = request.form.get('price', type=float)
+        stock = request.form.get('stock', type=int)
+        is_starred = request.form.get('is_starred') == 'on'
 
         # Handle image upload
-        image_file = form.image.data
+        image_file = request.files.get('image')
         if image_file and allowed_file(image_file.filename):
             filename = secure_filename(image_file.filename)
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             image_file.save(image_path)  # Save the uploaded image to the upload folder
 
-            image_url = os.path.join('static/uploads', filename)  # Relative URL for the image
+            image_url =  f'uploads/{filename}'  # Save relative path # Relative URL for the image
         else:
             image_url = None  # Handle case where no image is uploaded
 
@@ -142,23 +140,16 @@ def add_product():
 
         # Add and commit to the database
         try:
-            # Add and commit to the database
             db.session.add(new_product)
             db.session.commit()
             flash('Product added successfully!', 'success')
+            return redirect(url_for('admin.list_products'))
         except Exception as e:
             db.session.rollback()  # Rollback in case of error
             print(f"Error saving product to the database: {e}")
             flash('There was an error adding the product. Please try again.', 'danger')
 
-        return redirect(url_for('admin.dashboard'))
-
-    else:
-        # Debugging - print any form validation errors
-        print("Form did not validate.")
-        print(form.errors)
-
-    return render_template('admin/add_product.html', form=form, categories=categories)
+    return render_template('admin/add_product.html', categories=categories)
 
 
 # Route to add new category
