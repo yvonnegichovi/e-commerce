@@ -8,6 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
+import functools
+from functools import wraps
 
 from flask import Blueprint
 
@@ -23,6 +25,25 @@ app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def admin_required(func):
+    """
+    Custom decorator to handle redirection based on whether the user is an admin or not
+    """
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        print(f"admin: {current_user.is_authenticated}, ID: {current_user.get_id()}")
+        if not current_user.is_authenticated:
+            flash('You need to log in as an admin to access this page.', 'warning')
+            print("ADMIN IS NOT AUTHENTICATED")
+            return redirect(url_for('admin.admin_login'))
+        elif not isinstance(current_user._get_current_object(), Admin):  # Ensure user is an Admin
+            flash('Admin access only.', 'danger')
+            return redirect(url_for('auth.login'))
+        print("ADMIN AUTHENTICATED")
+        return func(*args, **kwargs)
+    return decorated_view
 
 
 @admin.route('register_admin', methods=['GET', 'POST'])
@@ -65,6 +86,7 @@ def admin_login():
             login_user(admin, remember=form.remember.data)
             print("YOU ARE OFFICIALLY LOGGED IN")
             flash('Successfully logged in as admin.', 'success')
+            print(f"Logged in as admin: {current_user.is_authenticated}, ID: {current_user.get_id()}")
             return redirect(url_for('admin.dashboard'))
         else:
             print("COULD NOT LOGIN FOR SOME REASON")
@@ -74,23 +96,23 @@ def admin_login():
     return render_template('admin/login.html', title='Admin Login', form=form)
 
 # Admin logout route
-@login_required
 @admin.route('/logout')
+@login_required
 def admin_logout():
-    session.pop('admin_logged_in', None)
+    logout_user()
     flash('You have successfully logged out.', 'success')
     return redirect(url_for('admin.admin_login'))
 
 # Admin dashboard route
-@login_required
 @admin.route('/dashboard')
+@admin_required
 def dashboard():
     return render_template('admin/dashboard.html')
 
 
 # List all products
-@login_required
 @admin.route('/products', methods=['GET'])
+@login_required
 def list_products():
     products =  Product.query.all()
     starred_products = Product.query.filter_by(is_starred=True).all()
@@ -99,10 +121,16 @@ def list_products():
 
 
 # Route to add new product
-@login_required
 @admin.route('/add_product', methods=['GET', 'POST'])
+@login_required
 def add_product():
     categories = Category.query.all()
+    print(f" Admin authenticated: {current_user.is_authenticated}")
+    print(f"Admin ID: {current_user.id}")
+
+    if not current_user.is_authenticated or not isinstance(current_user.id, Admin):
+        flash('You need to be logged in to add a product.', 'warning')
+        return redirect(url_for('admin.admin_login'))
 
     # Check if it's a POST request
     if request.method == 'POST':
@@ -126,6 +154,11 @@ def add_product():
         else:
             image_url = None  # Handle case where no image is uploaded
 
+        # Check if current_user.id is set
+        """if not current_user.is_authenticated or not current_user.id:
+            flash('You need to be logged in to add a product.', 'warning')
+            return redirect(url_for('admin.admin_login'))"""
+
         # Create new product instance
         new_product = Product(
             product_name=product_name,
@@ -134,6 +167,8 @@ def add_product():
             category_id=category_id,
             price=price,
             stock=stock,
+            user_id=current_user.id,
+            status='unordered',
             image=image_url,  # Store image filename in the database
             is_starred=is_starred
         )
@@ -142,6 +177,7 @@ def add_product():
         try:
             db.session.add(new_product)
             db.session.commit()
+            print("PRODUCT SUCCESSFULLY ADDED")
             flash('Product added successfully!', 'success')
             return redirect(url_for('admin.list_products'))
         except Exception as e:
@@ -153,8 +189,8 @@ def add_product():
 
 
 # Route to add new category
-@login_required
 @admin.route('/add_category', methods=['GET', 'POST'])
+@login_required
 def add_category():
     form = CategoryForm()
     if form.validate_on_submit():
@@ -173,8 +209,8 @@ def add_category():
     return render_template('admin/add_category.html', form=form)
 
 
-@login_required
 @admin.route('/admin/edit-product/<int:product_id>', methods=['GET', 'POST'])
+@login_required
 def edit_product(product_id):
     # Retrieve the product from the database
     product = Product.query.get_or_404(product_id)
@@ -211,8 +247,8 @@ def edit_product(product_id):
     return render_template('admin/edit_product.html', product=product)
 
 
-@login_required
 @admin.route('/delete-product/<int:product_id>', methods=['POST'])
+@login_required
 def delete_product(product_id):
     product = Product.query.get(product_id)
 
@@ -226,8 +262,8 @@ def delete_product(product_id):
     return redirect(url_for('admin.list_products'))
 
 
-@login_required
 @admin.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
+@login_required
 def edit_category(category_id):
     """
     Editing a category
@@ -251,8 +287,8 @@ def edit_category(category_id):
             flash('Error updating the category. Please try again', 'danger')
     return render_template('admin/edit_category.html', category=category)
 
-@login_required
 @admin.route('/delete-category/<int:category_id>', methods=['POST'])
+@login_required
 def delete_category(category_id):
     """
     Deletes a category
@@ -267,8 +303,8 @@ def delete_category(category_id):
     return redirect(url_for('admin.list_categories'))
 
 
-@login_required
 @admin.route('/categories')
+@login_required
 def list_categories():
     """
     Lists the categories lists
@@ -278,6 +314,7 @@ def list_categories():
 
 # Route to view user wishlists
 @admin.route('/view_wishlists')
+@login_required
 def view_wishlists():
     if not session.get('admin_logged_in'):
         flash('Please log in to view user wishlists.', 'danger')

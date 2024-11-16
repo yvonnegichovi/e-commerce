@@ -87,6 +87,11 @@
 
             <!-- Submit button -->
             <button type="submit" class="btn btn-primary w-100">Register</button>
+
+            <!-- Register instead link -->
+            <small class="text-muted ml-2">
+                Already have an Account?<a href="{{ url_for('admin.admin_login') }}">Login</a>
+            </small>
         </form>
     </div>
 

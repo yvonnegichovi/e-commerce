@@ -14,7 +14,12 @@ from sqlalchemy.ext.declarative import declarative_base
 def load_user(user_id):
     try:
         user_uuid = UUID(user_id)
-        return User.query.get(str(user_uuid))
+        """ First, try loading as an Admin"""
+        user = Admin.query.get(str(user_uuid))
+        if user is None:
+            """ If not an Admin, try loading as a regular User"""
+            user = User.query.get(str(user_uuid))
+        return user
     except ValueError:
         return None
 
@@ -27,6 +32,8 @@ class User(UserMixin, db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Create a one to many relationship
+    products = db.relationship('Product', backref='user', lazy=True)
 
     @property
     def is_authenticated(self):
@@ -44,9 +51,9 @@ class User(UserMixin, db.Model):
         return f"User('{self.name}', '{self.email}', '{self.password_hash}')"
 
 
-class Admin(db.Model):
+class Admin(UserMixin, db.Model):
     __tablename__ = 'admin'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -85,9 +92,11 @@ class Product(db.Model):
     # Foreign key to Category
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
+    # Foreign key to User
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+
     def __repr__(self):
         return f"<Product {self.product_name}>"
-
 
 class Category(db.Model):
     __tablename__ = 'categories'

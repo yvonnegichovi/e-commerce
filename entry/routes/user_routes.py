@@ -39,6 +39,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
             print("Login successful")
+            flash('Logged in successfully', 'success')
             return redirect(url_for('product.dashboard'))
         else:
             flash('Invalid email or password', 'danger')
@@ -48,8 +49,6 @@ def login():
 @login_required
 @auth.route('/logout')
 def logout():
-    session.clear()
-
-    flash('You have successfully logged out.', 'sucess')
-
+    logout_user()
+    flash('You have successfully logged out.', 'success')
     return redirect(url_for('auth.login'))

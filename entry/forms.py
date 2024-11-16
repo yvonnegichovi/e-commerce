@@ -6,7 +6,7 @@ from entry.models import Category
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Full Names', validators=[DataRequired(), Length(min=2, max=20)])
+    name = StringField('Full Names', validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     phone = StringField('Contact Number', validators=[DataRequired(),
                                  Regexp(r'^[0-9]{10}$',
