@@ -32,7 +32,7 @@ def product_detail(product_id):
 @product.route('/wishlist/add/<int:product_id>', methods=['POST'])
 def add_to_wishlist(product_id):
     """Adds a product to a user wishlist"""
-    product = Produst.query.get_or_404(product_id)
+    product = Product.query.get_or_404(product_id)
 
     if product.status == "wishlist":
         flash("Product already in your wishlist! Click Cart to purchase", "info")
@@ -50,3 +50,19 @@ def view_wishlist(user_id):
     """Displays a user's Wishlist page"""
     wishlist_products = Product.query.filter_by(status="wishlist", user_id=user_id).all()
     return render_template('/products/view_wishlist', wishlist_products=wishlist_products)
+
+
+@product.route('/cart/add/<int:product_id>', methods=['POST', 'GET'])
+def add_to_cart(product_id):
+    """
+    Adds a product into the cart
+    """
+    product = Product.query.get_or_404(product_id)
+
+    if product.status == "cart":
+        flash("Product already added to your Cart. Continue shopping", "info")
+    else:
+        product.status == "cart"
+        db.session.commit()
+        flash("Product successfully added to your Cart!", "success")
+    return redirect(url_for('product.view_cartlist', user_id=current_user.id))

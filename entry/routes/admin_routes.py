@@ -33,15 +33,8 @@ def admin_required(func):
     """
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        print(f"admin: {current_user.is_authenticated}, ID: {current_user.get_id()}")
-        if not current_user.is_authenticated:
-            flash('You need to log in as an admin to access this page.', 'warning')
-            print("ADMIN IS NOT AUTHENTICATED")
-            return redirect(url_for('admin.admin_login'))
-        elif not isinstance(current_user._get_current_object(), Admin):  # Ensure user is an Admin
-            flash('Admin access only.', 'danger')
-            return redirect(url_for('auth.login'))
-        print("ADMIN AUTHENTICATED")
+        if not current_user.is_authenticated or not isinstance(current_user._get_current_object(), Admin):
+            return redirect(url_for('admin.admin_login', next=request.url))
         return func(*args, **kwargs)
     return decorated_view
 
@@ -97,7 +90,6 @@ def admin_login():
 
 # Admin logout route
 @admin.route('/logout')
-@login_required
 def admin_logout():
     logout_user()
     flash('You have successfully logged out.', 'success')
@@ -105,14 +97,13 @@ def admin_logout():
 
 # Admin dashboard route
 @admin.route('/dashboard')
-@admin_required
 def dashboard():
+    print(f"The admin: {current_user.is_authenticated}, ID: {current_user.get_id()}")
     return render_template('admin/dashboard.html')
 
 
 # List all products
 @admin.route('/products', methods=['GET'])
-@login_required
 def list_products():
     products =  Product.query.all()
     starred_products = Product.query.filter_by(is_starred=True).all()
@@ -122,13 +113,11 @@ def list_products():
 
 # Route to add new product
 @admin.route('/add_product', methods=['GET', 'POST'])
-@login_required
 def add_product():
     categories = Category.query.all()
     print(f" Admin authenticated: {current_user.is_authenticated}")
-    print(f"Admin ID: {current_user.id}")
 
-    if not current_user.is_authenticated or not isinstance(current_user.id, Admin):
+    if not current_user.is_authenticated or not isinstance(current_user, Admin):
         flash('You need to be logged in to add a product.', 'warning')
         return redirect(url_for('admin.admin_login'))
 
@@ -167,7 +156,6 @@ def add_product():
             category_id=category_id,
             price=price,
             stock=stock,
-            user_id=current_user.id,
             status='unordered',
             image=image_url,  # Store image filename in the database
             is_starred=is_starred
@@ -190,8 +178,8 @@ def add_product():
 
 # Route to add new category
 @admin.route('/add_category', methods=['GET', 'POST'])
-@login_required
 def add_category():
+    print(f"The admin: {current_user.is_authenticated}, ID: {current_user.get_id()}")
     form = CategoryForm()
     if form.validate_on_submit():
         try:
@@ -210,7 +198,6 @@ def add_category():
 
 
 @admin.route('/admin/edit-product/<int:product_id>', methods=['GET', 'POST'])
-@login_required
 def edit_product(product_id):
     # Retrieve the product from the database
     product = Product.query.get_or_404(product_id)
@@ -248,7 +235,6 @@ def edit_product(product_id):
 
 
 @admin.route('/delete-product/<int:product_id>', methods=['POST'])
-@login_required
 def delete_product(product_id):
     product = Product.query.get(product_id)
 
@@ -263,7 +249,6 @@ def delete_product(product_id):
 
 
 @admin.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
-@login_required
 def edit_category(category_id):
     """
     Editing a category
@@ -288,7 +273,6 @@ def edit_category(category_id):
     return render_template('admin/edit_category.html', category=category)
 
 @admin.route('/delete-category/<int:category_id>', methods=['POST'])
-@login_required
 def delete_category(category_id):
     """
     Deletes a category
@@ -304,7 +288,6 @@ def delete_category(category_id):
 
 
 @admin.route('/categories')
-@login_required
 def list_categories():
     """
     Lists the categories lists
@@ -314,7 +297,6 @@ def list_categories():
 
 # Route to view user wishlists
 @admin.route('/view_wishlists')
-@login_required
 def view_wishlists():
     if not session.get('admin_logged_in'):
         flash('Please log in to view user wishlists.', 'danger')

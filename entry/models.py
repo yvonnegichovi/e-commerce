@@ -13,14 +13,22 @@ from sqlalchemy.ext.declarative import declarative_base
 @login_manager.user_loader
 def load_user(user_id):
     try:
-        user_uuid = UUID(user_id)
+        print(f"Loading user with ID:{user_id}")
         """ First, try loading as an Admin"""
-        user = Admin.query.get(str(user_uuid))
-        if user is None:
+        user = Admin.query.filter_by(id=str(user_id)).first()
+        if user:
+            print(f"Loaded Admin: {user}")
+            return user
+        user = User.query.filter_by(id=str(user_id)).first()
+        if user:
             """ If not an Admin, try loading as a regular User"""
-            user = User.query.get(str(user_uuid))
-        return user
+            print(f"This is the user id:{user.id}")
+            return user
+
+        print("No user found")
+        return None
     except ValueError:
+        print("Invalid user ID format")
         return None
 
 
@@ -32,8 +40,10 @@ class User(UserMixin, db.Model):
     phone = db.Column(db.String(20), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    # Create a one to many relationship
-    products = db.relationship('Product', backref='user', lazy=True)
+
+    # Relationship to Wishlist
+    wishlists = db.relationship('Wishlist', backref='owner', lazy=True)
+    cart_items = db.relationship('CartList', backref='cartlist_owner', lazy=True)
 
     @property
     def is_authenticated(self):
@@ -92,8 +102,8 @@ class Product(db.Model):
     # Foreign key to Category
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
 
-    # Foreign key to User
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    wishlists = db.relationship('Wishlist', backref='wishlist_product', lazy=True)
+    cart_items = db.relationship('CartList', backref='cartlist_product', lazy=True)
 
     def __repr__(self):
         return f"<Product {self.product_name}>"
@@ -109,3 +119,32 @@ class Category(db.Model):
 
     def __repr__(self):
         return f"<Category {self.name}>"
+
+class Wishlist(db.Model):
+    __tablename__ = 'wishlists'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+
+    # Relationships to enable easy access to the associated user and product
+    product = db.relationship('Product', backref='product_wishlists', lazy=True)
+    user = db.relationship('User', backref='user_wishlists', lazy=True)
+
+    def __repr__(self):
+        return f"<Wishlist id={self.id}, product_id={self.product_id}, user_id={self.user_id}>"
+
+
+class CartList(db.Model):
+    __tablename__ = 'cartlists'  # Pluralized name for convention
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)  # User's ID
+    quantity = db.Column(db.Integer, nullable=False, default=1)  # Quantity of the product in the cart
+
+    # Relationships to the Product and User
+    product = db.relationship('Product', backref='cartilist_items', lazy=True)
+    user = db.relationship('User', backref='cartlist_items', lazy=True)
+
+    def __repr__(self):
+        return f"<CartList id={self.id}, product_id={self.product_id}, user_id={self.user_id}, quantity={self.quantity}>"
+
