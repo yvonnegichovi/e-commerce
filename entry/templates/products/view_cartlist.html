@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Cart</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Your Cart</h2>
+        {% if cartlist_products %}
+            <div class="row">
+                {% for item in cartlist_products %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <img src="{{ url_for('static', filename=item.product.image) if item.product.image else url_for('static', filename='images/placeholder.jpg') }}"
+                                 class="card-img-top img-fluid"
+                                 alt="{{ item.product.product_name }}"
+                                 style="max-height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.product.product_name }}</h5>
+                                <p class="card-text">
+                                    <strong>Price:</strong> ${{ item.product.price }}<br>
+                                    <strong>Quantity:</strong> {{ item.quantity }}
+                                </p>
+                                <div class="mb-2">
+                                    <input type="number" id="quantity-{{ item.product_id }}" class="form-control mb-2" placeholder="Update Quantity" min="1">
+                                    <button class="btn btn-primary btn-sm" onclick="updateQuantity({{ item.product_id }})">Update Quantity</button>
+                                </div>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromCart({{ item.product_id }})">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">Your cart is empty. Start adding products!</p>
+        {% endif %}
+        <a href="{{ url_for('product.dashboard') }}" class="btn btn-secondary mt-4">Continue Shopping</a>
+    </div>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script>
+        function updateQuantity(productId) {
+            const quantity = document.getElementById(`quantity-${productId}`).value;
+            if (!quantity || quantity <= 0) {
+                alert("Please enter a valid quantity.");
+                return;
+            }
+
+            fetch(`{{ url_for('product.add_to_cart', product_id='') }}${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token if needed
+                },
+                body: JSON.stringify({ quantity: parseInt(quantity) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Quantity updated successfully!");
+                    location.reload();
+                } else {
+                    alert(data.message || "Failed to update quantity.");
+                }
+            })
+            .catch(error => {
+                alert("An error occurred. Please try again.");
+            });
+        }
+
+        function removeFromCart(productId) {
+            if (!confirm("Are you sure you want to remove this item from your cart?")) {
+                return;
+            }
+
+            fetch(`{{ url_for('product.remove_from_cartlist', product_id='') }}${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token if needed
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Item removed successfully!");
+                    location.reload();
+                } else {
+                    alert(data.message || "Failed to remove item.");
+                }
+            })
+            .catch(error => {
+                alert("An error occurred. Please try again.");
+            });
+        }
+    </script>
+</body>
+</html>

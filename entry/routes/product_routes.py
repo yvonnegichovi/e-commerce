@@ -101,16 +101,24 @@ def add_to_cart(product_id):
         flash("Product successfully added to your Cart!", "success")
     return redirect(url_for('product.view_cartlist', user_id=current_user.id))
 
-
 @product.route('/cart/<user_id>', methods=['GET'])
 @login_required
 def view_cartlist(user_id):
+    cartlist_products = CartList.query.filter_by(user_id=user_id).all()
+
+    user = User.query.filter_by(id=user_id).first()
+    return render_template('/products/view_cartlist.html', cartlist_products=cartlist_products, user=user)
+
+
+@product.route('/cartlist/remove/<int:cartlist_id>', methods=['POST'])
+@login_required
+def remove_from_cartlist(cartlist_id):
     try:
-        # Query the cart list
-        cartlist_products = CartList.query.filter_by(user_id=user_id).all()
-        return jsonify([{
-            "product_id": item.product_id,
-            "quantity": item.quantity
-        } for item in cartlist_products]), 200
+        cartlist_item = CartList.query.get(cartlist_id)
+        if not cartlist_item:
+            return jsonify({'status': 'error', 'message': 'Item not found'}), 404
+        db.session.delete(cartlist_item)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Item removed successfully'}), 200
     except Exception as e:
-        return jsonify({'status': 'error', 'message': 'Failed to retrieve cartlist', 'error': str(e)}), 500
+        return jsonify({'status': 'error', 'message': 'Failed to remove item', 'error': str(e)}), 500
