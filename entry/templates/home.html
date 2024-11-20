@@ -43,7 +43,7 @@
         <div class="jumbotron text-center">
             <h1>Welcome to Zed Beauty!</h1>
             <p class="lead">Explore our products and enjoy a seamless shopping experience.</p>
-            <a class="btn btn-primary btn-lg" href="#" role="button">Browse Products</a>
+            <a class="btn btn-primary btn-lg" href="#all_products" role="button">Browse Products</a>
         </div>
 
         <!-- Product Listings -->
@@ -62,10 +62,10 @@
                                 <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                                 <!-- Edit button specific to each product -->
-                                <!--<a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-warning">Edit</a> -->
-                                <! --<form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="display: inline;"> -->
-                                    <!--<button type="submit" class="btn btn-danger">Delete</button>
-                            </form>-->
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-warning">Cart</a
+                                <form action="{{ url_for('auth.login') }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger">Wishlist</button>
+                            </form>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- All Products Section -->
-        <div class="row mt-5">
+        <div id="all_products" class="row mt-5">
             <h2 class="text-center mb-4">All Products</h2>
             {% if products %}
                 {% for product in products %}
@@ -89,8 +89,8 @@
                                 <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                                 <!-- Edit button specific to each product -->
-                                <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="display: inline;">                                                                                         <button type="submit" class="btn btn-danger">Delete</button>
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-warning">Cart</a>
+                            <form action="{{ url_for('auth.login') }}" method="POST" style="display: inline;">                                                                                         <button type="submit" class="btn btn-danger">Wishlist</button>
                             </form>
                             </div>
                         </div>

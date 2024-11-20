@@ -12,7 +12,8 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('main.home') }}">Zed Beauty</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -38,7 +39,8 @@
         <!-- Product Info -->
         <div class="row">
             <div class="col-md-6">
-                <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}" class="img-fluid" alt="{{ product.product_name }}">
+                <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}" 
+                     class="img-fluid" alt="{{ product.product_name }}">
             </div>
             <div class="col-md-6">
                 <h4>Description</h4>
@@ -46,14 +48,21 @@
                 <p><strong>Price:</strong> Ksh. {{ product.price }}</p>
                 <p><strong>Category:</strong> {{ product.category.name }}</p>
                 <p><strong>More Details:</strong> {{ product.more_details }}</p>
+                <p><strong>Stock:</strong> {{ product.stock }}</p>
 
-                <!-- Add to Cart and Wishlist -->
-                <form action="#" method="POST">
+                <!-- Add to Cart -->
+                <form id="add-to-cart-form" action="{{ url_for('product.add_to_cart', product_id=product.id) }}" method="POST">
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity" min="1" value="1" required class="form-control">
+                    </div>
                     <button type="submit" class="btn btn-primary">Add to Cart</button>
                 </form>
-                <form action="#" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-outline-secondary">Add to Wishlist</button>
-                </form>
+
+                <!-- Add to Wishlist Button -->
+                <button type="button" class="btn btn-outline-secondary mt-3" id="addToWishlistButton" data-product-id="{{ product.id }}">
+                    Add to Wishlist
+                </button>
             </div>
         </div>
 
@@ -64,7 +73,8 @@
                 {% for category_product in category_products %}
                     <div class="col-lg-2 col-md-3 col-sm-6 mb-4">
                         <div class="card h-100">
-                            <img src="{{ url_for('static', filename=category_product.image) if category_product.image else url_for('static', filename='images/placeholder.jpg') }}" class="card-img-top" alt="{{ category_product.product_name }}">
+                            <img src="{{ url_for('static', filename=category_product.image) if category_product.image else url_for('static', filename='images/placeholder.jpg') }}" 
+                                 class="card-img-top" alt="{{ category_product.product_name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ category_product.product_name }}</h5>
                                 <p class="card-text">{{ category_product.description }}</p>
@@ -83,6 +93,44 @@
         </div>
     </div>
 
+    <!-- Modal for Add to Cart -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Item Added to Cart</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    The product has been added to your cart. What would you like to do next?
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ url_for('product.product_detail', product_id=product.id) }}" class="btn btn-secondary">Continue Shopping</a>
+                    <a href="{{ url_for('product.view_cartlist', user_id=current_user.id) }}" class="btn btn-primary">Go to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add to Wishlist Confirmation -->
+    <div class="modal fade" id="wishlistConfirmationModal" tabindex="-1" aria-labelledby="wishlistConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="wishlistConfirmationModalLabel">Wishlist Update</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="wishlistConfirmationMessage">
+                    <!-- Message will be dynamically updated via JavaScript -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                    <a href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}" class="btn btn-primary">Go to Wishlist</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-light py-3 text-center mt-5">
         <div class="container">
@@ -92,5 +140,70 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript for Add to Cart -->
+    <script>
+        document.getElementById('add-to-cart-form').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Collect form data
+            const formData = new FormData(this);
+            const quantity = formData.get('quantity');
+
+            // Send AJAX POST request to add to cart
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                credentials: 'include' // Include cookies for authentication
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // Ensure your route returns JSON
+                } else {
+                    throw new Error('Failed to add to cart.');
+                }
+            })
+            .then(data => {
+                // Show the cart modal
+                const cartModal = new bootstrap.Modal(document.getElementById('cartModal'));
+                cartModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add product to the cart.');
+            });
+        });
+    </script>
+
+    <!-- JavaScript for Add to Wishlist -->
+    <script>
+        document.getElementById('addToWishlistButton').addEventListener('click', function () {
+            const productId = this.getAttribute('data-product-id');
+
+            // Send AJAX POST request to add to wishlist
+            fetch(`/wishlist/add/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include' // Include cookies for authentication
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update the modal message
+                const messageElement = document.getElementById('wishlistConfirmationMessage');
+                messageElement.textContent = data.message;
+
+                // Show the wishlist confirmation modal
+                const wishlistModal = new bootstrap.Modal(document.getElementById('wishlistConfirmationModal'));
+                wishlistModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to add product to the wishlist.');
+            });
+        });
+    </script>
+
 </body>
 </html>
