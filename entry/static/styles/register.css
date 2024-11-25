@@ -1,3 +1,4 @@
+yvonne@DESKTOP-RB87F2G:~/e-commerce$ cat entry/static/styles/login.css
 /* Custom Gold Card Background */
 .card-gold {
     background-color: white; /* Gold color */
@@ -17,14 +18,15 @@
     display: flex;
     flex-direction: column; /* Stacks images vertically */
     align-items: center; /* Center the images horizontally */
-    margin-left: 20px; /* Add space between the card and the images */
+    margin-left: 40px; /* Add space between the card and the images */
 }
 
 .side-image {
-    width: 190px; /* Adjust image size */
-    height: 190px;
+    width: 260px; /* Adjust image size */
+    height: 260px;
     object-fit: cover;
     border-radius: 1%; /* Makes images circular */
+    margin-top: 70px;
     margin-bottom: 40px; /* Space between stacked images */
 }
 

@@ -5,115 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - E-Commerce</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="../static/styles/register.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .password-container {
+            position: relative;
+            width: 400px;
+            margin: auto;
+            text-align: left;
+        }
+
+        input[type="password"],
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid orange;
+            border-radius: 5px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 68%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav style="background-color: orange;" class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('main.home') }}">Zed Beauty</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <h2 class="text-center mb-4">Register an Account</h2>
+    <div class="container mt-5 d-flex justify-content-center">
+        <!-- Card for Register Form with Gold Background -->
+        <div class="card-gold" style="width: 25rem;">
+            <div class="card-body">
+                <h4 class="card-welcome text-center mb-4">Buy from Us</h4>
+                <h2 class="card-title text-center mb-4">Create an Account</h2>
 
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-        <!-- Form for user registration -->
-        <form method="POST" action="{{ url_for('auth.register') }}">
-            <!-- CSRF protection -->
-            {{ form.hidden_tag() }}
+                <!-- Register Form -->
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    {{ form.hidden_tag() }}
 
-            <!-- Full Name input -->
-            <div class="mb-3">
-                <label for="name" class="form-label">Full Name</label>
-                {{ form.name(class_="form-control", id="name", placeholder="Enter your full name") }}
-                {% if form.name.errors %}
-                    <div class="text-danger">
-                        {{ form.name.errors[0] }}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name</label>
+                        {{ form.name(class_="form-control", id="name", placeholder="Enter your full name") }}
+                        {% if form.name.errors %}
+                            <div class="text-danger">
+                                {{ form.name.errors[0] }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
 
-            <!-- Email input -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                {{ form.email(class_="form-control", id="email", placeholder="Enter your email") }}
-                {% if form.email.errors %}
-                    <div class="text-danger">
-                        {{ form.email.errors[0] }}
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        {{ form.email(class_="form-control", id="email", placeholder="Enter your email") }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {{ form.email.errors[0] }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
 
-            <!-- Phone input -->
-            <div class="mb-3">
-                <label for="phone" class="form-label">Phone Number</label>
-                {{ form.phone(class_="form-control", id="phone", placeholder="Enter your phone number") }}
-                {% if form.phone.errors %}
-                    <div class="text-danger">
-                        {{ form.phone.errors[0] }}
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        {{ form.phone(class_="form-control", id="phone", placeholder="Enter your phone number") }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger">
+                                {{ form.phone.errors[0] }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
 
-            <!-- Password input -->
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                {{ form.password(class_="form-control", id="password", placeholder="Enter your password") }}
-                {% if form.password.errors %}
-                    <div class="text-danger">
-                        {{ form.password.errors[0] }}
+                    <div class="password-container">
+                        <label for="password">Password</label>
+                        {{ form.password(class_="form-control", id="password", placeholder="Enter your password") }}
+                        <span id="togglePassword" class="toggle-password">👁️</span>
+                        {% if form.password.errors %}
+                            <div class="text-danger">
+                                {{ form.password.errors[0] }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
 
-            <!-- Confirm Password input -->
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                {{ form.confirm_password(class_="form-control", id="confirm_password", placeholder="Confirm your password") }}
-                {% if form.confirm_password.errors %}
-                    <div class="text-danger">
-                        {{ form.confirm_password.errors[0] }}
+                    <div class="password-container">
+                        <label for="confirm_password">Confirm Password</label>
+                        {{ form.confirm_password(class_="form-control", id="confirm_password", placeholder="Confirm your password") }}
+                        <span id="toggleConfirmPassword" class="toggle-password">👁️</span>
+                        {% if form.confirm_password.errors %}
+                            <div class="text-danger">
+                                {{ form.confirm_password.errors[0] }}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
-            </div>
 
-            <!-- Submit button -->
-            <button type="submit" class="btn btn-primary w-100">Register</button>
-            <!-- Register instead link -->
-            <small class="text-muted ml-2">
-                Already have an Account?<a href="{{ url_for('auth.login') }}">Login</a>
-            </small>
-        </form>
+                    <button type="submit" class="btn" style="background-color: orange; color: white; border: none; width: 100%;">Register</button>
+
+                    <div class="d-flex justify-content-center mt-4">
+                        <p>Already have an Account? | <a href="{{ url_for('auth.login') }}" style="color: orange;">Login</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="image-stack">
+            <img src="{{ url_for('static', filename='images/male_shopper.jpg') }}" alt="Male Shopper" class="side-image">
+            <img src="{{ url_for('static', filename='images/female_shopper.jpg') }}" alt="Female Shopper" class="side-image">
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+
+        togglePassword.addEventListener('click', () => {
+            // Toggle the type attribute for password field
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePassword.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+
+        toggleConfirmPassword.addEventListener('click', () => {
+            // Toggle the type attribute for confirm password field
+            const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.setAttribute('type', type);
+            toggleConfirmPassword.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+        });
+    </script>
 </body>
 </html>
+
