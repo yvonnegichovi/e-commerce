@@ -83,6 +83,7 @@ def add_to_cart(product_id):
     product = Product.query.get_or_404(product_id)
 
     quantity = request.form.get('quantity', type=int)
+    print("IT IS NOW POSSIBLE TO ADD")
 
     if quantity is None or quantity <= 0:
         flash("Please provide a valid quantity!", "danger")
@@ -112,9 +113,10 @@ def view_cartlist(user_id):
 
 @product.route('/cartlist/remove/<int:cartlist_id>', methods=['POST'])
 @login_required
-def remove_from_cartlist(cartlist_id):
+def remove_from_cartlist(product_id):
+    print("IT IS NOW POSSIBLE TO REMOVE ITEMS")
     try:
-        cartlist_item = CartList.query.get(cartlist_id)
+        cartlist_item = CartList.query.filter_by(product_id=product+id, user_id=current_user.id).first
         if not cartlist_item:
             return jsonify({'status': 'error', 'message': 'Item not found'}), 404
         db.session.delete(cartlist_item)

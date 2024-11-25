@@ -48,7 +48,7 @@
 
         <!-- Product Listings -->
         <!-- Starred Products Section -->
-        <div class="row mt-5">
+        <div id="all_products" class="row mt-5">
             <h2 class="text-center mb-4">Starred Products</h2>
             {% if starred_products %}
                 {% for product in starred_products %}
@@ -62,7 +62,7 @@
                                 <p class="card-text"><strong>Price:</strong> Ksh. {{ product.price }}</p>
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                                 <!-- Edit button specific to each product -->
-                                <a href="{{ url_for('auth.login') }}" class="btn btn-warning">Cart</a
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-warning">Cart</a>
                                 <form action="{{ url_for('auth.login') }}" method="POST" style="display: inline;">
                                     <button type="submit" class="btn btn-danger">Wishlist</button>
                             </form>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- All Products Section -->
-        <div id="all_products" class="row mt-5">
+        <div id="products" class="row mt-5">
             <h2 class="text-center mb-4">All Products</h2>
             {% if products %}
                 {% for product in products %}
@@ -90,6 +90,7 @@
                                 <p class="card-text"><strong>Stock:</strong> {{ product.stock }}</p>
                                 <!-- Edit button specific to each product -->
                                 <a href="{{ url_for('auth.login') }}" class="btn btn-warning">Cart</a>
+
                             <form action="{{ url_for('auth.login') }}" method="POST" style="display: inline;">                                                                                         <button type="submit" class="btn btn-danger">Wishlist</button>
                             </form>
                             </div>

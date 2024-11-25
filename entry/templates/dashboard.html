@@ -72,6 +72,7 @@
                 {% for product in products %}
                     <div class="col-lg-2 col-md-3 col-sm-6 mb-4">
                         <div class="card h-100">
+                            <a href="{{ url_for('product.product_detail', product_id=product.id) }}" class="stretched-link"></a>
                             <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
                                 class="card-img-top" alt="{{ product.product_name }}">
                             <div class="card-body">

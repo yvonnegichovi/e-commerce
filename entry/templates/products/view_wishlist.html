@@ -102,7 +102,7 @@
                 <img src="{{ url_for('static', filename=item.product.image) if item.product.image else url_for('static', filename='images/placeholder.jpg') }}" class="img-fluid" alt="{{ item.product.product_name }}">
                 <div class="card-details">
                     <h3>{{ item.product.product_name }}</h3>
-                    <p>Price: ${{ item.product.price }}</p>
+                    <p>Price: Ksh. {{ item.product.price }}</p>
                     <p>{{ item.product.description }}</p>
                 </div>
                 <div class="card-actions">

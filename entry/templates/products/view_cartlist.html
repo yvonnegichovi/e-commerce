@@ -4,9 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Cart</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"">
+	<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('main.home') }}">Zed Beauty</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('product.view_cartlist', user_id=current_user.id) }}">Cartlist</a>
+                    </li>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}">Wishlist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('product.dashboard') }}">Dashboard</a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div class="container mt-5">
         <h2 class="mb-4">Your Cart</h2>
         {% if cartlist_products %}
@@ -28,7 +58,7 @@
                                     <input type="number" id="quantity-{{ item.product_id }}" class="form-control mb-2" placeholder="Update Quantity" min="1">
                                     <button class="btn btn-primary btn-sm" onclick="updateQuantity({{ item.product_id }})">Update Quantity</button>
                                 </div>
-                                <button class="btn btn-danger btn-sm" onclick="removeFromCart({{ item.product_id }})">Remove</button>
+                                <button class="btn btn-danger btn-sm" onclick="removeFromCart({{ item.id }})">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -48,11 +78,12 @@
                 return;
             }
 
-            fetch(`{{ url_for('product.add_to_cart', product_id='') }}${productId}`, {
+            const url = `/cart/add/${productID}`;
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token if needed
                 },
                 body: JSON.stringify({ quantity: parseInt(quantity) })
             })
@@ -70,16 +101,18 @@
             });
         }
 
+
         function removeFromCart(productId) {
             if (!confirm("Are you sure you want to remove this item from your cart?")) {
                 return;
             }
 
-            fetch(`{{ url_for('product.remove_from_cartlist', product_id='') }}${productId}`, {
+            const url = `/cart/remove_from_cartlist/${productId}`;
+
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token() }}' // Include CSRF token if needed
                 }
             })
             .then(response => response.json())
