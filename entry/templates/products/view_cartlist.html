@@ -39,6 +39,15 @@
     </nav>
     <div class="container mt-5">
         <h2 class="mb-4">Your Cart</h2>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% if cartlist_products %}
             <div class="row">
                 {% for item in cartlist_products %}

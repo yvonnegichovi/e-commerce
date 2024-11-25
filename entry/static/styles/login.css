@@ -1,0 +1,13 @@
+/* Custom Gold Card Background */
+.card-gold {
+    background-color: #e8c882; /* Gold color */
+    border: 1px solid #DAA520; /* Slightly darker border to match */
+}
+
+.card-gold .card-title, .card-gold .form-label {
+    color: black; /* White text on gold background */
+}
+
+body {
+    background-color: gold;
+} 

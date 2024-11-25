@@ -96,6 +96,16 @@
         <h1>{{ user.name }}'s Wishlist</h1>
     </header>
     <main>
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         {% if wishlist_products %}
             {% for item in wishlist_products %}
             <div class="card">
