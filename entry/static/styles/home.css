@@ -1,0 +1,214 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f2eae1;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+a:hover {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: orange;
+}
+
+.nav-link {
+    color: #333;
+    margin: 0 5px;
+}
+
+.nav-link:hover {
+    color: #007bff;
+}
+
+/* Jumbotron */
+.jumbotron {
+    background-color: #ffffff;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.jumbotron h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+p.lead {
+    font-size: 1.25rem;
+    color: #555;
+    font-family: cursive;
+}
+
+/* Orange Button */
+.btn-primary {
+    background-color: #ff7f50; /* Coral Orange */
+    border-color: #ff7f50;
+    color: #fff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #ff5722; /* Darker Orange */
+    border-color: #ff5722;
+}
+
+/* Specific Orange Button */
+.browse-btn {
+    background-color: #ff7f50; /* Coral Orange */
+    border-color: #ff7f50;
+    color: #fff;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.browse-btn:hover {
+    background-color: #ff5722; /* Darker Orange */
+    border-color: #ff5722;
+}
+
+
+/* Product Cards */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.8s ease;
+    width: 100%;
+    color: green;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 350px;
+    width: 100%;
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.card .btn {
+    margin: 5px;
+}
+
+.card-text span {
+    margin-right: 2px; /* Add spacing between elements */
+    font-size: 14px; /* Adjust font size if needed */
+    text-align: center;
+}
+
+.btn img {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover img {
+    transform: scale(1.2); /* Slight zoom effect on hover */
+}
+
+/* About Section */
+#about {
+    background-color: #ffffff;
+    padding: 30px;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 50px;
+}
+
+#about h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#about p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Footer */
+footer {
+    background-color: #e9ecef;
+    color: #333;
+    text-align: center;
+    padding: 15px 0;
+    border-top: 1px solid #e3e3e3;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 990px) {
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+
+    .jumbotron p.lead {
+        font-size: 1rem;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        text-align: center;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+
+    .jumbotron p.lead {
+        font-size: 1rem;
+    }
+
+    .card-img-top {
+        object-fit: cover;
+        height: 500px;
+    }
+
+    .card-body {
+        text-align: center;
+    }
+}

@@ -9,10 +9,6 @@
     color: black; /* White text on gold background */
 }
 
-.form-control {
-    background-color: green;
-}
-
 .image-stack {
     display: flex;
     flex-direction: column; /* Stacks images vertically */
@@ -26,13 +22,10 @@
     object-fit: cover;
     border-radius: 1%; /* Makes images circular */
     margin-bottom: 40px; /* Space between stacked images */
+    margin-top: 20px;
 }
 
 .side-image:last-child {
     margin-bottom: 0; /* Remove margin for the last image */
-}
-
-.navbar {
-    margin-bottom: 20px;
-    border: 3px green;
+    margin-top: 20px;
 }

@@ -10,10 +10,6 @@ yvonne@DESKTOP-RB87F2G:~/e-commerce$ cat entry/static/styles/login.css
     color: black; /* White text on gold background */
 }
 
-.form-control {
-    background-color: green;
-}
-
 .image-stack {
     display: flex;
     flex-direction: column; /* Stacks images vertically */
@@ -22,11 +18,10 @@ yvonne@DESKTOP-RB87F2G:~/e-commerce$ cat entry/static/styles/login.css
 }
 
 .side-image {
-    width: 260px; /* Adjust image size */
-    height: 260px;
+    width: 220px; /* Adjust image size */
+    height: 220px;
     object-fit: cover;
-    border-radius: 1%; /* Makes images circular */
-    margin-top: 70px;
+    margin-top: 60px;
     margin-bottom: 40px; /* Space between stacked images */
 }
 
