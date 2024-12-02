@@ -2,35 +2,39 @@
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
-    background-color: #f2eae1;
+    background-color: white;
     margin: 0;
     padding: 0;
 }
 
 a {
     text-decoration: none;
-    color: #333;
+    color: orange;
+    align-text: right;
 }
 
 a:hover {
-    color: #007bff;
+    color: #c24106;
     text-decoration: underline;
 }
 
 /* Navbar Styles */
 .navbar-brand {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: bold;
     color: orange;
+    text-align: right;
 }
 
 .nav-link {
-    color: #333;
+    color: orange;
     margin: 0 5px;
+    display: flex;
+    align-items: right;
 }
 
 .nav-link:hover {
-    color: #007bff;
+    color: #1f0302;
 }
 
 /* Jumbotron */
@@ -45,6 +49,7 @@ a:hover {
 .jumbotron h1 {
     font-size: 2.5rem;
     margin-bottom: 20px;
+    font-weight: bold;
 }
 
 p.lead {
@@ -79,6 +84,17 @@ p.lead {
     border-color: #ff5722;
 }
 
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Add some spacing between cards */
+    justify-content: left;
+}
+
+.col-lg-2, .col-md-4, .col-sm-6, .col-12 {
+    padding: 0 2px; /* Adjust padding for better spacing */
+}
+
 
 /* Product Cards */
 .card {
@@ -87,7 +103,7 @@ p.lead {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.8s ease;
     width: 100%;
-    color: green;
+    max-width: 250px;
 }
 
 .card:hover {
@@ -95,11 +111,14 @@ p.lead {
 }
 
 .card-img-top {
-    height: 350px;
-    width: 100%;
+    height: 200px;
+    width: 80%;
     object-fit: cover;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    margin-top: 10px;
+    align-items: center;
+    display: flex;
 }
 
 .card-body {
@@ -193,22 +212,32 @@ footer p {
     }
 }
 
-/* Responsive Design */
+/* Responsive Design for Mobile View */
 @media (max-width: 768px) {
-    .jumbotron h1 {
-        font-size: 2rem;
+    .row {
+        display: flex;
+        flex-wrap: wrap; /* Ensure cards wrap correctly */
+        justify-content: left; /* Center align cards */
     }
 
-    .jumbotron p.lead {
-        font-size: 1rem;
+    .col-lg-2, .col-md-4, .col-sm-6, .col-12 {
+        flex: 0 0 46%; /* Set two cards per row (48% + some margin for spacing) */
+        max-width: 48%;
+        margin: 1%; /* Add margin for spacing between cards */
+    }
+
+    .card {
+        width: 100%; /* Ensure cards fit within their container */
+        margin: 0 auto; /* Center align each card */
     }
 
     .card-img-top {
         object-fit: cover;
-        height: 500px;
+        height: 200px; /* Adjust image height for better proportions */
     }
 
     .card-body {
         text-align: center;
     }
 }
+

@@ -33,8 +33,10 @@ def register():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    print("WE ARE IN LOGIN PAGE")
     form = LoginForm()
     if form.validate_on_submit():
+        print("MY REGISTRATION FORM IS VALIDATED")
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
@@ -42,6 +44,7 @@ def login():
             flash('Logged in successfully', 'success')
             return redirect(url_for('product.dashboard'))
         else:
+            print("COULD NOT LOGIN FOR SOME REASON")
             flash('Invalid email or password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
