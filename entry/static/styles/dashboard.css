@@ -1,0 +1,175 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: orange;
+    align-text: right;
+}
+
+a:hover {
+    color: #c24106;
+    text-decoration: underline;
+}
+
+/* Navbar Styles */
+.navbar-brand {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: orange;
+    text-align: right;
+}
+
+.nav-link {
+    color: orange;
+    margin: 0 5px;
+    display: flex;
+    align-items: right;
+}
+
+.nav-link:hover {
+    color: #1f0302;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Add some spacing between cards */
+    justify-content: left;
+}
+
+.col-lg-2, .col-md-4, .col-sm-6, .col-12 {
+    padding: 0 2px; /* Adjust padding for better spacing */
+}
+
+
+/* Product Cards */
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.8s ease;
+    width: 100%;
+    max-width: 250px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 200px;
+    width: 80%;
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-top: 10px;
+    align-items: center;
+    display: flex;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.card .btn {
+    margin: 5px;
+}
+
+.card-text span {
+    margin-right: 2px; /* Add spacing between elements */
+    font-size: 14px; /* Adjust font size if needed */
+    text-align: center;
+}
+
+.btn img {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    transition: transform 0.2s ease;
+}
+
+.btn:hover img {
+    transform: scale(1.2); /* Slight zoom effect on hover */
+}
+
+/* Footer */
+footer {
+    background-color: #e9ecef;
+    color: #333;
+    text-align: center;
+    padding: 15px 0;
+    border-top: 1px solid #e3e3e3;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 990px) {
+    .jumbotron h1 {
+        font-size: 2rem;
+    }
+
+    .jumbotron p.lead {
+        font-size: 1rem;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        text-align: center;
+    }
+}
+
+/* Responsive Design for Mobile View */
+@media (max-width: 768px) {
+    .row {
+        display: flex;
+        flex-wrap: wrap; /* Ensure cards wrap correctly */
+        justify-content: left; /* Center align cards */
+    }
+
+    .col-lg-2, .col-md-4, .col-sm-6, .col-12 {
+        flex: 0 0 46%; /* Set two cards per row (48% + some margin for spacing) */
+        max-width: 48%;
+        margin: 1%; /* Add margin for spacing between cards */
+    }
+
+    .card {
+        width: 100%; /* Ensure cards fit within their container */
+        margin: 0 auto; /* Center align each card */
+    }
+
+    .card-img-top {
+        object-fit: cover;
+        height: 200px; /* Adjust image height for better proportions */
+    }
+
+    .card-body {
+        text-align: center;
+    }
+}
