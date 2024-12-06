@@ -124,3 +124,14 @@ def remove_from_cartlist(product_id):
         return jsonify({'status': 'success', 'message': 'Item removed successfully'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': 'Failed to remove item', 'error': str(e)}), 500
+
+
+@product.route('/categories/<int:category_id>')
+def list_by_category(category_id):
+    """
+    Lists products in a specific category.
+    """
+    category = Category.query.get_or_404(category_id)
+    products = Product.query.filter_by(category_id=category.id).all()
+    print(f"FETCHED {category.name} SUCESSFULLY")
+    return render_template('product/list_by_category.html', category=category, products=products)

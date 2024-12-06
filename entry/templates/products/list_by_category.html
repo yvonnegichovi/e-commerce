@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ category.name }} - Products</title>
+    <!-- Add your CSS/JS here -->
+</head>
+<body>
+    <h1>Products in {{ category.name }}</h1>
+    <ul>
+        {% for product in products %}
+            <li>
+                <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
+                    {{ product.name }} - Ksh. {{ product.price }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

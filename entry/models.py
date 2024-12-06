@@ -98,7 +98,6 @@ class Product(db.Model):
     stock = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_starred = db.Column(db.Boolean, default=False)
-    status = db.Column(db.String(20), nullable=False, default='unordered')
 
     # Foreign key to Category
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)

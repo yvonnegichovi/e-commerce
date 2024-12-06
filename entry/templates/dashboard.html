@@ -6,7 +6,7 @@
     <title>User Dashboard - Zed Beauty</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-     <link rel="stylesheet" type="text/css" href="../static/styles/dashboard.css" />
+    <link rel="stylesheet" type="text/css" href="../static/styles/dashboard.css" />
 </head>
 <body>
 
@@ -33,78 +33,91 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container mt-5">
-        <h1 class="text-center">Welcome to Your Dashboard</h1>
+    <!-- Main Content Layout -->
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Side Navigation -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <h4 class="text-center mt-4">Categories</h4>
+                    <ul class="nav flex-column">
+                        {% if categories %}
+                            {% for category in categories %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('product.list_by_category', category_id=category.id) }}">
+                                        {{ category.name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="nav-item">
+                                <p class="text-center">No categories available.</p>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
 
-        <!-- Product Listings -->
-        <!-- Starred Products Section -->
-        <div id="all_products" class="row mt-5">
-            <h2 class="text-center mb-4">Starred Products</h2>
-            {% if starred_products %}
-                {% for product in starred_products %}
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-4">
-                        <div class="card">
-                            <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
-                                <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
-                                class="card-img-top" alt="{{ product.product_name }}">
-                            </a>
-                            <div class="card-body">
-                                <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
-                                    <h5 class="card-title">{{ product.product_name }}</h5>
-                                    <p class="card-text d-flex justify-content-between">
-                                </a>
-                                <span><strong>Price:</strong> Ksh. {{ product.price }}</span>
-                                <span><strong>Stock:</strong> {{ product.stock }}</span>
-                                </p>
-                                
-                                <!-- Edit button specific to each product -->
-                                <a href="#" class="btn btn-warning p-0" style="border: none;">
-                                    <img src="{{ url_for('static', filename='images/shopping_cart.png') }}" alt="Cart" style="width: 30px; height: 30px;">
-                                </a>
-                                <form action="#" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger p-0" style="border: none; background: none;">
-                                        <img src="{{ url_for('static', filename='images/wishlist-icon.jpg') }}" alt="Wishlist" style="width: 30px; height: 30px;">
-                                    </button>
-                                </form>
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h1 class="text-center mt-4">Welcome to Your Dashboard</h1>
+
+                <!-- Starred Products Section -->
+                <div id="all_products" class="row mt-5">
+                    <h2 class="text-center mb-4">Starred Products</h2>
+                    {% if starred_products %}
+                        {% for product in starred_products %}
+                            <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-4">
+                                <div class="card">
+                                    <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
+                                        <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
+                                             class="card-img-top" alt="{{ product.product_name }}">
+                                    </a>
+                                    <div class="card-body">
+                                        <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
+                                            <h5 class="card-title">{{ product.product_name }}</h5>
+                                        </a>
+                                        <p class="card-text d-flex justify-content-between">
+                                            <span><strong>Price:</strong> Ksh. {{ product.price }}</span>
+                                            <span><strong>Stock:</strong> {{ product.stock }}</span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-center">No starred products available.</p>
-            {% endif %}
-        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center">No starred products available.</p>
+                    {% endif %}
+                </div>
 
-        <!-- All Products Section -->
-        <div id="products" class="row mt-5">
-            <h2 class="text-center mb-4">All Products</h2>
-            {% if products %}
-                {% for product in products %}
-                    <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-4">
-                        <div class="card">
-                            <img src="{{ url_for('static', filename=product.image) if product.image else 'https://via.placeholder.com/150' }}" class="card-img-top" alt="{{ product.product_name }}">                                                        <div class="card-body">                                                        <h5 class="card-title">{{ product.product_name }}</h5>
-                                <p class="card-text d-flex justify-content-between">
-                                <span><strong>Price:</strong> Ksh. {{ product.price }}</span>
-                                <span><strong>Stock:</strong> {{ product.stock }}</span>
-                                </p>
-
-                                <!-- Edit button specific to each product -->
-                                 <a href="#" class="btn btn-warning p-0" style="border: none;">
-                                    <img src="{{ url_for('static', filename='images/shopping_cart.png') }}" alt="Cart" style="width: 30px; height: 30px;">
-                                </a>
-                                <form action="#" method="POST" style="display: inline;">
-                                    <button type="submit" class="btn btn-danger p-0" style="border: none; background: none;">
-                                        <img src="{{ url_for('static', filename='images/wishlist-icon.jpg') }}" alt="Wishlist" style="width: 30px; height: 30px;">
-                                    </button>
-                                </form>
+                <!-- All Products Section -->
+                <div id="products" class="row mt-5">
+                    <h2 class="text-center mb-4">All Products</h2>
+                    {% if products %}
+                        {% for product in products %}
+                            <div class="col-lg-2 col-md-4 col-sm-6 col-12 mb-4">
+                                <div class="card">
+                                    <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
+                                        <img src="{{ url_for('static', filename=product.image) if product.image else url_for('static', filename='images/placeholder.jpg') }}"
+                                             class="card-img-top" alt="{{ product.product_name }}">
+                                    </a>
+                                    <div class="card-body">
+                                        <a href="{{ url_for('product.product_detail', product_id=product.id) }}">
+                                            <h5 class="card-title">{{ product.product_name }}</h5>
+                                        </a>
+                                        <p class="card-text d-flex justify-content-between">
+                                            <span><strong>Price:</strong> Ksh. {{ product.price }}</span>
+                                            <span><strong>Stock:</strong> {{ product.stock }}</span>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-center">No products available.</p>
-            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center">No products available.</p>
+                    {% endif %}
+                </div>
+            </main>
         </div>
     </div>
 
@@ -119,3 +132,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

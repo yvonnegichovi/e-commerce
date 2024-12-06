@@ -1,0 +1,30 @@
+/* Modal information */
+.modal-body {
+    align-text: center;
+    background-color: light-pink;
+}
+
+.row {
+    background-color: white;
+}
+
+.form-control {
+    background-color: pink;
+}
+
+.form-label {
+    color: blue;
+}
+
+.col-md-6 {
+    color: orange;
+}
+
+.btn {
+    color: orange;
+    background-color: white;
+}
+
+.text-center {
+    color: purple;
+}
