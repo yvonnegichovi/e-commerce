@@ -100,7 +100,13 @@ def add_to_cart(product_id):
         db.session.add(cart_item)
         db.session.commit()
         flash("Product successfully added to your Cart!", "success")
-    return redirect(url_for('product.view_cartlist', user_id=current_user.id))
+
+    # After adding to cart, return a JSON response indicating success
+    return jsonify({
+        'message': "Product added to cart!",
+        'product_id': product_id,
+        'quantity': quantity
+    })
 
 @product.route('/cart/<user_id>', methods=['GET'])
 @login_required

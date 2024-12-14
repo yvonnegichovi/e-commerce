@@ -3,140 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Cart</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"">
-	<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <title>Cart List</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles/cartlist.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('main.home') }}">Zed Beauty</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('product.view_cartlist', user_id=current_user.id) }}">Cartlist</a>
-                    </li>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}">Wishlist</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('product.dashboard') }}">Dashboard</a>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container mt-5">
-        <h2 class="mb-4">Your Cart</h2>
-
-        <!-- Flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        {% if cartlist_products %}
-            <div class="row">
-                {% for item in cartlist_products %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <img src="{{ url_for('static', filename=item.product.image) if item.product.image else url_for('static', filename='images/placeholder.jpg') }}"
-                                 class="card-img-top img-fluid"
-                                 alt="{{ item.product.product_name }}"
-                                 style="max-height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ item.product.product_name }}</h5>
-                                <p class="card-text">
-                                    <strong>Price:</strong> ${{ item.product.price }}<br>
-                                    <strong>Quantity:</strong> {{ item.quantity }}
-                                </p>
-                                <div class="mb-2">
-                                    <input type="number" id="quantity-{{ item.product_id }}" class="form-control mb-2" placeholder="Update Quantity" min="1">
-                                    <button class="btn btn-primary btn-sm" onclick="updateQuantity({{ item.product_id }})">Update Quantity</button>
-                                </div>
-                                <button class="btn btn-danger btn-sm" onclick="removeFromCart({{ item.id }})">Remove</button>
+    <section class="cartlist-section py-20 bg-light overflow-hidden">
+        <div class="container">
+            <h2 class="mb-8">Shopping Cart</h2>
+            <p class="mb-14 lead text-secondary">Review your selected items</p>
+            <div class="cart-item mb-12 py-8 px-8 px-md-20 bg-white">
+                <div class="row align-items-center mb-8">
+                    <div class="col-12 col-lg-3 mb-8 mb-lg-0">
+                        <div class="item-image bg-light-light d-flex align-items-center justify-content-center">
+                            <img class="img-fluid" src="item-image-placeholder.png" alt="Item Image">
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-9">
+                        <div class="d-flex mb-16">
+                            <div class="me-auto">
+                                <h3 class="lead fw-bold">Item Name</h3>
+                                <p class="mb-0 text-secondary">Item description or details</p>
+                            </div>
+                            <span class="h5 text-info">$29.89</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-sm-auto mb-6 mb-sm-0 me-lg-10">
+                                <p class="mb-6 fw-bold">Quantity</p>
+                                <input type="number" class="item-quantity" value="1" min="1">
+                            </div>
+                            <div class="col-12 col-lg-auto ms-auto mt-10 mt-lg-0">
+                                <button class="btn col-12 col-md-auto btn-light mb-4 mb-md-0 me-md-4 text-uppercase">Remove</button>
+                                <button class="btn col-12 col-md-auto btn-primary">Save for Later</button>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% else %}
-            <p class="text-muted">Your cart is empty. Start adding products!</p>
-        {% endif %}
-        <a href="{{ url_for('product.dashboard') }}" class="btn btn-secondary mt-4">Continue Shopping</a>
-    </div>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script>
-        function updateQuantity(productId) {
-            const quantity = document.getElementById(`quantity-${productId}`).value;
-            if (!quantity || quantity <= 0) {
-                alert("Please enter a valid quantity.");
-                return;
-            }
 
-            const url = `/cart/add/${productID}`;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity: parseInt(quantity) })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Quantity updated successfully!");
-                    location.reload();
-                } else {
-                    alert(data.message || "Failed to update quantity.");
-                }
-            })
-            .catch(error => {
-                alert("An error occurred. Please try again.");
-            });
-        }
-
-
-        function removeFromCart(productId) {
-            if (!confirm("Are you sure you want to remove this item from your cart?")) {
-                return;
-            }
-
-            const url = `/cart/remove_from_cartlist/${productId}`;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Item removed successfully!");
-                    location.reload();
-                } else {
-                    alert(data.message || "Failed to remove item.");
-                }
-            })
-            .catch(error => {
-                alert("An error occurred. Please try again.");
-            });
-        }
-    </script>
+            <div class="cart-total py-8 px-8 px-md-20 bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="fw-bold">Total:</h3>
+                    <span class="h4 text-info">$59.78</span>
+                </div>
+                <div class="d-flex justify-content-end mt-4">
+                    <button class="btn btn-primary text-uppercase">Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
+

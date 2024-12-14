@@ -1,23 +1,91 @@
 /* Modal information */
 .modal-body {
     align-text: center;
-    background-color: light-pink;
+    background-color: #f7f2f2;
+    border-radius: 15px;
 }
 
-.row {
+.body {
+    background-color: #f7f2f2;
+}
+
+.container {
+    font-size: 10px;
+    border: 2px solid white;
+    margin-top: 7px;
+    margin-right: 10px;
+    margin-left: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
     background-color: white;
 }
 
-.form-control {
-    background-color: pink;
+.container_one {
+    display: flex;
+    flex-direction: row;
 }
 
-.form-label {
-    color: blue;
+.container_two {
+    font-size: 10px;
+    border: 2px solid white;
+    border-radius: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+    background-color: white;
+    padding: 5px;
+}
+
+.container_three {
+    font-size: 10px;
+    border: 2px solid white;
+    border-radius: 15px;
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: white;
+}
+
+.col-md-4 {
+    background-color: white;
 }
 
 .col-md-6 {
+    background-color: white;
+}
+
+.delivery_info {
+    text-align: center;
+    font-size: 15px;
+}
+
+.row {
+    background-color: #fcece3;
+    border: 2px orange;
+    font-size: 10px;
+}
+
+.description {
+    margin-top: 10px;
+    margin-left: 15px;
+}
+
+.form-control {
+    background-color: white;
+    margin-right: 20px;
+}
+
+.form-label {
+    color: black;
+}
+
+.col-md-6 {
+    color: black;
+    margin-top: 10px;
+}
+
+.col-md-4 {
     color: orange;
+    margin-top: 10px;
 }
 
 .btn {
