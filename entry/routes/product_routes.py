@@ -48,6 +48,38 @@ def add_to_wishlist(product_id):
 
     return jsonify(response)
 
+from flask import request, jsonify
+
+@product.route('/update_quantity', methods=['POST'])
+@login_required
+def update_quantity():
+    try:
+        # Get data from the request
+        cart_id = request.json.get('cart_id')
+        new_quantity = request.json.get('quantity')
+
+        # Fetch the cart item from the database
+        cart_item = CartList.query.filter_by(id=cart_id)
+
+        if not cart_item:
+            return jsonify({'error': 'Cart item not found'}), 404
+
+        # Update the quantity
+        cart_item.quantity = new_quantity
+
+        # Commit the changes
+        db.session.commit()
+
+        # Recalculate the total price for the updated cart
+        total_price = sum(item.product.price * item.quantity
+                          for item in CartList.query.filter_by(user_id=cart_item.user_id).all())
+
+        return jsonify({'message': 'Quantity updated successfully', 'total_price': total_price}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'An error occurred', 'details': str(e)}), 500
+
 
 
 @product.route('/wishlist/<user_id>', methods=['GET', 'POST'])
@@ -113,16 +145,23 @@ def add_to_cart(product_id):
 def view_cartlist(user_id):
     cartlist_products = CartList.query.filter_by(user_id=user_id).all()
 
-    user = User.query.filter_by(id=user_id).first()
-    return render_template('/products/view_cartlist.html', cartlist_products=cartlist_products, user=user)
+    # Calculate total price
+    total_price = sum(item.product.price * item.quantity for item in cartlist_products)
 
+    user = User.query.filter_by(id=user_id).first()
+    return render_template(
+        '/products/view_cartlist.html', 
+        cartlist_products=cartlist_products, 
+        user=user, 
+        total_price=total_price
+    )
 
 @product.route('/cartlist/remove/<int:cartlist_id>', methods=['POST'])
 @login_required
 def remove_from_cartlist(product_id):
     print("IT IS NOW POSSIBLE TO REMOVE ITEMS")
     try:
-        cartlist_item = CartList.query.filter_by(product_id=product+id, user_id=current_user.id).first
+        cartlist_item = CartList.query.filter_by(product_id=product.id, user_id=current_user.id).first
         if not cartlist_item:
             return jsonify({'status': 'error', 'message': 'Item not found'}), 404
         db.session.delete(cartlist_item)

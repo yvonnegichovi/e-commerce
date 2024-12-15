@@ -97,3 +97,38 @@ h3 {
     text-transform: uppercase;
 }
 
+.quantity-control {
+    max-width: 150px;
+    margin: 0 auto;
+    display-flex: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.btn-increment,
+.btn-decrement {
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    cursor: pointer;
+}
+
+.btn-increment:hover,
+.btn-decrement:hover {
+    background-color: #e2e6ea;
+}
+
+.item-quantity {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 5px;
+}
+
