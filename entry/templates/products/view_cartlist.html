@@ -4,24 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart List</title>
-    <link rel="stylesheet" type="text/css" href="../static/styles/cartlist.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/styles/cartlist.css">
+    <style>
+        /* Sticky Totals Sidebar */
+        .totals-sidebar {
+            position: sticky;
+            top: 1rem;
+        }
+
+        /* Totals for Mobile View */
+        @media (max-width: 992px) {
+            .totals-sidebar {
+                position: static;
+                margin-top: 1rem;
+            }
+            .totals-bottom {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: white;
+                z-index: 1000;
+                box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
 
-     <!-- Navigation Bar -->
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('main.home') }}">Zed Beauty</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">                                                                                   <a class="nav-link active" href="{{ url_for('product.dashboard') }}">Dashboard</a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('product.dashboard') }}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}">Wishlist</a>
+                        <a class="nav-link" href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}">Wishlist</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
@@ -31,124 +58,168 @@
         </div>
     </nav>
 
-    <div class="container">
-    <h3 class="mb-8">Shopping Cart</h3>
-    <p class="mb-14 lead text-secondary">Review your selected items</p>
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-9">
+                <h3 class="mb-4">Shopping Cart</h3>
+                <p class="lead text-muted">Review and manage your selected items.</p>
 
-{% for product in cartlist_products %}
-<div class="cart-item mb-12 py-8 px-8 px-md-20 bg-white">
-    <div class="row align-items-center mb-8">
-        <!-- Product Image -->
-        <div class="col-12 col-lg-3 mb-8 mb-lg-0">
-            <div class="item-image bg-light-light d-flex align-items-center justify-content-center">
-                <img class="img-fluid" src="{{ url_for('static', filename=product.product.image) }}" 
-                     alt="{{ product.product.product_name }}">
-            </div>
-        </div>
-        <!-- Product Details -->
-        <div class="col-12 col-lg-9">
-            <div class="d-flex mb-16">
-                <!-- Product Name -->
-                <div class="me-auto">
-                    <h4 class="lead fw-bold">{{ product.product.product_name }}</h4>
+                {% for product in cartlist_products %}
+                <div class="selector">
+                    <input type="checkbox" class="form-check-input checkout-item" data-price="{{ product.product.price }}" data-quantity="{{ product.quantity }}" id="checkout-{{ product.id }}" onclick="toggleSelection(this, '{{ product.product.product_name }}', {{ product.product.price }})">
+                    <label class="form-check-label" for="checkout-{{ product.id }}">Select for Checkout</label>
                 </div>
-                <!-- Product Price -->
-                <span class="h5 text-info">Ksh. {{ product.product.price }}</span>
-            </div>
-            <div class="quantity-control d-flex align-items-center">
-                <!-- Decrement Button -->
-                <button type="button" class="btn btn-light btn-decrement" 
-                        onclick="updateQuantity(this, -1)" 
-                        data-cart-id="{{ product.id }}">−</button>
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <!-- Product Image -->
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename=product.product.image) }}" alt="{{ product.product.product_name }}" class="img-fluid rounded-start">
+                        </div>
 
-                <!-- Quantity Input -->
-                <input type="number" class="form-control item-quantity text-center"
-                       name="quantity" value="{{ product.quantity }}" 
-                       min="1" readonly data-cart-id="{{ product.id }}">
+                        <!-- Product Details -->
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.product.product_name }}</h5>
+                                <p class="card-text text-secondary">Price: <span class="fw-bold">Ksh. {{ product.product.price }}</span></p>
 
-                <!-- Increment Button -->
-                <button type="button" class="btn btn-light btn-increment" 
-                        onclick="updateQuantity(this, 1)" 
-                        data-cart-id="{{ product.id }}">+</button>
+                                <div class="d-flex align-items-center">
+                                    <!-- Quantity Controls -->
+                                    <button type="button" class="btn btn-outline-secondary me-2 btn-decrement" onclick="updateQuantity(this, -1)" data-cart-id="{{ product.id }}">&minus;</button>
+                                    <input type="number" class="form-control text-center item-quantity" value="{{ product.quantity }}" min="1" readonly data-cart-id="{{ product.id }}" style="width: 60px;">
+                                    <button type="button" class="btn btn-outline-secondary ms-2 btn-increment" onclick="updateQuantity(this, 1)" data-cart-id="{{ product.id }}">&plus;</button>
+                                </div>
+                                <p class="card-text text-secondary">
+    Total: <span class="item-total-price fw-bold">Ksh. {{ product.quantity * product.product.price }}</span>
+</p>
+
+
+                                <div class="mt-3">
+                                    <button class="btn btn-primary me-2" onclick="saveForLater({{ product.id }})">Save for Later</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            <div class="d-flex justify-content-end mt-10">
-                <!-- Remove Button -->
-                <button class="btn btn-light me-4 text-uppercase" 
-                        onclick="removeItem({{ product.id }})">Remove</button>
-                <!-- Save for Later Button -->
-                <button class="btn btn-primary text-uppercase" 
-                        onclick="saveForLater({{ product.id }})">Save for Later</button>
+
+            <!-- Summary Sidebar -->
+        <div class="col-lg-3">
+            <div class="totals-sidebar bg-light p-4 rounded">
+                <h5 class="mb-3">Cart Summary</h5>
+                <p>Total Items Selected: <span id="totalItems">0</span></p>
+                <h5 class="text-info">Total Price: Ksh. <span id="summaryPriceMobile">0.00</span></h5>
+                <button class="btn btn-success w-100 mt-4" onclick="proceedToCheckout()">Proceed to Checkout</button>
             </div>
         </div>
     </div>
 </div>
-{% endfor %}
 
-<div class="cart-total py-8 px-8 px-md-20 bg-white">
-    <div class="d-flex justify-content-between align-items-center">
-        <h3 class="fw-bold">Total:</h3>
-        <span id="total-price" class="h4 text-info">
-            Ksh. {{ total_price }}
-        </span>
-    </div>
-    <div class="d-flex justify-content-end mt-4">
-        <button class="btn btn-primary text-uppercase">Proceed to Checkout</button>
-    </div>
+<!-- Sticky Totals for Mobile -->
+<div class="totals-bottom d-lg-none">
+    <!-- Updated ID for mobile total -->
+    <h5 class="text-info">Ksh. <span id="summaryPrice">0.00</span></h5>
+    <button class="btn btn-success w-40 mt-2" onclick="proceedToCheckout()">Checkout</button>
 </div>
 
-
-</body>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function updateQuantity(button, increment) {
-    const quantityInput = button.closest('.quantity-control').querySelector('.item-quantity');
-    const cartId = quantityInput.dataset.cartId;
-    let currentQuantity = parseInt(quantityInput.value);
 
-    // Update the quantity in the input field
+const selectedItems = [];
+
+function updateSummary() {
+    const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalItems = selectedItems.length;
+
+    const formattedPrice = totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    document.getElementById('summaryPrice').textContent = formattedPrice;
+    document.getElementById('summaryPriceMobile').textContent = formattedPrice; // For mobile
+    document.getElementById('totalItems').textContent = totalItems;
+}
+
+document.querySelectorAll('.checkout-item').forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+        const price = parseFloat(this.dataset.price);
+        const quantity = parseInt(this.dataset.quantity, 10);
+        const id = this.dataset.id;
+
+        const existingItem = selectedItems.find(item => item.id === id);
+
+        if (this.checked) {
+            if (existingItem) {
+                // If the item is already selected, just update the quantity
+                existingItem.quantity = existingItem.quantity + quantity; // Increase quantity
+            } else {
+                // If the item is not selected yet, add it to the array
+                selectedItems.push({ id, price, quantity });
+            }
+        } else {
+            // If the item is deselected, remove it from the selectedItems array
+            const index = selectedItems.findIndex(item => item.id === id);
+            if (index !== -1) {
+                selectedItems.splice(index, 1);
+            }
+        }
+
+        // Update the summary after selection change
+        updateSummary();
+    });
+});
+
+
+// Update quantity of an item
+function updateQuantity(button, increment) {
+    const quantityInput = button.closest('.card-body').querySelector('.item-quantity');
+    const cartId = quantityInput.dataset.cartId;
+    const checkbox = button.closest('.card').querySelector('.checkout-item');
+
+    let currentQuantity = parseInt(quantityInput.value);
     const newQuantity = currentQuantity + increment;
-    if (newQuantity < 1) return; // Prevent negative or zero quantities
+
+    if (newQuantity <= 0) {
+        alert('Quantity must be at least 1.');
+        return;
+    }
+
     quantityInput.value = newQuantity;
 
-    // Send the updated quantity to the server
-    fetch('/product/update_quantity', {
+    fetch('/update_quantity', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cart_id: cartId, quantity: newQuantity })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert(data.error);
-        } else {
-            // Update the total price on the page
-            document.getElementById('total-price').innerText = `Ksh. ${data.total_price}`;
-        }
-    })
-    .catch(error => {
-        console.error('Error updating quantity:', error);
-    });
-}
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const productPrice = parseFloat(data.product_price);
 
+                // Update item total price in the UI
+                const itemTotalPrice = newQuantity * productPrice;
+                const priceElement = button.closest('.card-body').querySelector('.item-total-price');
+                priceElement.textContent = `Ksh. ${itemTotalPrice.toFixed(2)}`;
 
-function removeItem(cartId) {
-    if (confirm("Are you sure you want to remove this item?")) {
-        fetch(`/remove-cart/${cartId}`, {
-            method: 'POST'
-        }).then(() => location.reload())
-          .catch(error => console.error('Error removing item:', error));
-    }
-}
-
-function saveForLater(cartId) {
-    fetch(`/save-for-later/${cartId}`, {
-        method: 'POST'
-    }).then(() => location.reload())
-      .catch(error => console.error('Error saving item for later:', error));
+                // If the item is selected, update the selection
+                if (checkbox.checked) {
+                    selectedItems = selectedItems.map(item =>
+                        item.name === data.product_name
+                            ? { ...item, quantity: newQuantity }
+                            : item
+                    );
+                    updateSelectedTotal();
+                }
+            }
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 </script>
 
+</body>
 </html>
 

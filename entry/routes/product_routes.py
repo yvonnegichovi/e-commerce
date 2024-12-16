@@ -50,36 +50,27 @@ def add_to_wishlist(product_id):
 
 from flask import request, jsonify
 
+
 @product.route('/update_quantity', methods=['POST'])
 @login_required
 def update_quantity():
-    try:
-        # Get data from the request
-        cart_id = request.json.get('cart_id')
-        new_quantity = request.json.get('quantity')
+    data = request.get_json()
+    cart_id = data.get('cart_id')
+    new_quantity = data.get('quantity')
 
-        # Fetch the cart item from the database
-        cart_item = CartList.query.filter_by(id=cart_id)
+    cart_item = CartList.query.get_or_404(cart_id)
+    cart_item.quantity = new_quantity
+    db.session.commit()
 
-        if not cart_item:
-            return jsonify({'error': 'Cart item not found'}), 404
+    product_price = cart_item.product.price
+    total_price = sum(item.product.price * item.quantity for item in CartList.query.filter_by(user_id=current_user.id).all())
 
-        # Update the quantity
-        cart_item.quantity = new_quantity
-
-        # Commit the changes
-        db.session.commit()
-
-        # Recalculate the total price for the updated cart
-        total_price = sum(item.product.price * item.quantity
-                          for item in CartList.query.filter_by(user_id=cart_item.user_id).all())
-
-        return jsonify({'message': 'Quantity updated successfully', 'total_price': total_price}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': 'An error occurred', 'details': str(e)}), 500
-
+    return jsonify({
+        'success': True,
+        'product_price': product_price,
+        'product_name': cart_item.product.product_name,
+        'total_price': total_price
+    })
 
 
 @product.route('/wishlist/<user_id>', methods=['GET', 'POST'])
@@ -166,6 +157,9 @@ def remove_from_cartlist(product_id):
             return jsonify({'status': 'error', 'message': 'Item not found'}), 404
         db.session.delete(cartlist_item)
         db.session.commit()
+
+        total_price = sum(item.product.price * item.quantity 
+                          for item in CartList.query.filter_by(user_id=cart_item.user_id).all())
         return jsonify({'status': 'success', 'message': 'Item removed successfully'}), 200
     except Exception as e:
         return jsonify({'status': 'error', 'message': 'Failed to remove item', 'error': str(e)}), 500
