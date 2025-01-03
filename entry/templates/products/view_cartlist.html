@@ -152,7 +152,7 @@ const selectedItems = [];
 
 function updateSummary() {
     const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const totalItems = selectedItems.length;
+    const totalItems = selectedItems.reduce((count, item) => count + item.quantity, 0);
 
     const formattedPrice = totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -226,13 +226,15 @@ function updateQuantity(button, increment) {
 
                 // If the item is selected, update the selection
                 if (checkbox.checked) {
-                    selectedItems = selectedItems.map(item =>
-                        item.name === data.product_name
-                            ? { ...item, quantity: newQuantity }
-                            : item
-                    );
-                    updateSelectedTotal();
+                    const ItemIndex = selectedItems.findIndex(item => item.id === cartId);
+                    if (itemIndex !== -1) {
+                        selectedItems[itemIndex].quantity = newQuantity;
+                    } else {
+                        selectedItems.push({ id: cartId, price: productPrice, quantity: newQuantity });
+                    }
                 }
+                // Recalculate the summary
+                updateSummary();
             }
         })
         .catch(error => console.error('Error:', error));

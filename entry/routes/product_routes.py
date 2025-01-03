@@ -58,6 +58,12 @@ def update_quantity():
     cart_id = data.get('cart_id')
     new_quantity = data.get('quantity')
 
+    if not data or 'cart_id' not in data or 'quantity' not in data:
+        return jsonify({'success': False, 'error': 'Invalid input data.'}), 400
+
+    if new_quantity <= 0:
+        return jsonify({'success': False, 'error': 'Quantity must be greater than 0.'}), 400
+
     cart_item = CartList.query.get_or_404(cart_id)
     cart_item.quantity = new_quantity
     db.session.commit()
