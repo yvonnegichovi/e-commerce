@@ -35,11 +35,13 @@ from entry.routes.main_routes import main
 from entry.routes.user_routes import auth
 from entry.routes.product_routes import product
 from entry.routes.admin_routes import admin
+from entry.routes.notifications_routes import notifications
 
 app.register_blueprint(main)
 app.register_blueprint(auth)
 app.register_blueprint(product)
 app.register_blueprint(admin)
+app.register_blueprint(notifications)
 
 from entry.models import User
 from entry.models import Product

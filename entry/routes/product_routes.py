@@ -4,6 +4,7 @@ from entry.models import User, Product, Admin, Wishlist, CartList
 from entry.forms import ProductForm
 from entry import app, db, bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
+from urllib.parse import quote
 import logging
 
 
