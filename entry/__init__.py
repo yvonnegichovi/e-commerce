@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+from markupsafe import escape
 import os
 
 load_dotenv()

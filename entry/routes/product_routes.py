@@ -156,20 +156,15 @@ def view_cartlist(user_id):
 
 @product.route('/cartlist/remove/<int:cartlist_id>', methods=['POST'])
 @login_required
-def remove_from_cartlist(product_id):
-    print("IT IS NOW POSSIBLE TO REMOVE ITEMS")
-    try:
-        cartlist_item = CartList.query.filter_by(product_id=product.id, user_id=current_user.id).first
-        if not cartlist_item:
-            return jsonify({'status': 'error', 'message': 'Item not found'}), 404
-        db.session.delete(cartlist_item)
+def remove_from_cart(cart_id):
+    print("YOU CAN NOW DELETE ITEMS")
+    cart_item = CartList.query.get(cart_id)
+    if cart_item:
+        db.session.delete(cart_item)
         db.session.commit()
-
-        total_price = sum(item.product.price * item.quantity 
-                          for item in CartList.query.filter_by(user_id=cart_item.user_id).all())
-        return jsonify({'status': 'success', 'message': 'Item removed successfully'}), 200
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': 'Failed to remove item', 'error': str(e)}), 500
+        return jsonify({"status": "success"}), 200
+    else:
+        return jsonify({"error": "Item not found"}), 404
 
 
 @product.route('/categories/<int:category_id>')
