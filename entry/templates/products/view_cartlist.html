@@ -81,16 +81,26 @@
 
                 {% for product in cartlist_products %}
                 <div class="selector">
-                    <input type="checkbox" class="form-check-input checkout-item" data-price="{{ product.product.price }}" data-quantity="{{ product.quantity }}" id="checkout-{{ product.id }}" onclick="toggleSelection(this, '{{ product.product.product_name }}', {{ product.product.price }})">
+                    <input type="checkbox" class="form-check-input checkout-item"
+                        data-cart-id="{{ product.id }}"
+                        data-price="{{ product.product.price }}"
+                        data-quantity="{{ product.quantity }}"
+                        id="checkout-{{ product.id }}"
+                        onclick="toggleSelection(this, '{{ product.product.product_name }}', {{ product.product.price }})">
                     <label class="form-check-label" for="checkout-{{ product.id }}">Select for Checkout</label>
                 </div>
                 <div class="card">
                     <div class="row">
                         <!-- Product Image -->
-                        <div class="col">
-                            <img src="{{ url_for('static', filename=product.product.image) }}" alt="{{ product.product.product_name }}" class="img-fluid rounded-start">
+                        <div class="col md-4 text-center">
+                            <img src="{{ url_for('static', filename=product.product.image) }}"
+                                alt="{{ product.product.product_name }}"
+                                class="img-fluid rounded-start">
                             <div class="mt-3 text-center">
-                                <button class="btn btn-danger" onclick="removeFromCart({{ product.id }})">Remove</button>
+                                <button class="btn btn-danger btn-sm"
+                                    onclick="removeFromCart({{ product.id }})">
+                                    Remove
+                                </button>
                             </div>
                         </div>
 
@@ -100,15 +110,32 @@
                                 <h5 class="card-title">{{ product.product.product_name }}</h5>
                                 <p class="card-text text-secondary">Price: <span class="fw-bold">Ksh. {{ product.product.price }}</span></p>
 
+                                <!-- Quantity Controls -->
                                 <div class="d-flex align-items-center">
-                                    <!-- Quantity Controls -->
-                                    <button type="button" class="btn btn-outline-secondary me-2 btn-decrement" onclick="updateQuantity(this, -1)" data-cart-id="{{ product.id }}">&minus;</button>
-                                    <input type="number" class="form-control text-center item-quantity" value="{{ product.quantity }}" min="1" readonly data-cart-id="{{ product.id }}" style="width: 60px;">
-                                    <button type="button" class="btn btn-outline-secondary ms-2 btn-increment" onclick="updateQuantity(this, 1)" data-cart-id="{{ product.id }}">&plus;</button>
+                                    <button type="button"
+                                        class="btn btn-outline-secondary me-2 btn-decrement"
+                                        onclick="updateQuantity(this, -1)"
+                                        data-cart-id="{{ product.id }}">
+                                        &minus;
+                                    </button>
+                                    <input type="number"
+                                        class="form-control text-center item-quantity"
+                                        value="{{ product.quantity }}"
+                                        min="1" readonly
+                                        data-cart-id="{{ product.id }}"
+                                        style="width: 60px;">
+                                    <button type="button"
+                                        class="btn btn-outline-secondary ms-2 btn-increment"
+                                        onclick="updateQuantity(this, 1)"
+                                        data-cart-id="{{ product.id }}">
+                                        &plus;
+                                    </button>
                                 </div>
+
+                                <!-- Item Total Price -->
                                 <p class="card-text text-secondary">
-    Total: <span class="item-total-price fw-bold">Ksh. {{ product.quantity * product.product.price }}</span>
-</p>
+                                    Total: <span class="item-total-price fw-bold">Ksh. {{ product.quantity * product.product.price }}</span>
+                                </p>
 
 
                                 <div class="mt-3">
@@ -156,7 +183,7 @@
     <script>
         function removeFromCart(cartId) {
             if (confirm("Are you sure you want to remove this item from the cart?")) {
-                fetch('/cartlist/remove/${cartId}', {
+                fetch(`/cartlist/remove/${cartId}`, {
                     method: 'POST',
                 })
                     .then(response => {
@@ -169,7 +196,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occured while removing the item.')'
+                        alert('An error occured while removing the item.')
                     });
             }
         }
@@ -224,18 +251,34 @@ function updateSummary() {
     document.getElementById('totalItems').textContent = totalItems;
 }
 
+function updateItemQuantity(id, newQuantity) {
+    const existingItem = selectedItems.find(item => item.id === id);
+    if (existingItem) {
+        existingItem.quantity = newQuantity;
+        if(newQuantity <= 0) {
+            //Remove the item if the quantity is zero or less
+            const index = selectedItems.indexOf(existingItem);
+            if (index !== -1) {
+                selectedItems.splice(index, 1);
+            }
+        }
+        updateSummary();
+    }
+}
+
+// Handle checkbox changes
 document.querySelectorAll('.checkout-item').forEach(checkbox => {
     checkbox.addEventListener('change', function () {
         const price = parseFloat(this.dataset.price);
         const quantity = parseInt(this.dataset.quantity, 10);
         const id = this.dataset.id;
 
-        const existingItem = selectedItems.find(item => item.id === id);
-
         if (this.checked) {
+            // Add the item or update its quantity
+            const existingItem = selectedItems.find(item => item.id === id);
             if (existingItem) {
                 // If the item is already selected, just update the quantity
-                existingItem.quantity = existingItem.quantity + quantity; // Increase quantity
+                existingItem.quantity += quantity; // Increase quantity
             } else {
                 // If the item is not selected yet, add it to the array
                 selectedItems.push({ id, price, quantity });
@@ -253,10 +296,14 @@ document.querySelectorAll('.checkout-item').forEach(checkbox => {
     });
 });
 
+</script>
+
+    <script>
 
 // Update quantity of an item
 function updateQuantity(button, increment) {
-    const quantityInput = button.closest('.card-body').querySelector('.item-quantity');
+    const cardBody = button.closest('.card-body');
+    const quantityInput = cardBody.querySelector('.item-quantity');
     const cartId = quantityInput.dataset.cartId;
     const checkbox = button.closest('.card').querySelector('.checkout-item');
 
@@ -264,7 +311,7 @@ function updateQuantity(button, increment) {
     const newQuantity = currentQuantity + increment;
 
     if (newQuantity <= 0) {
-        alert('Quantity must be at least 1.');
+        quantityInput.value = 1; // Reset to minimum quantity
         return;
     }
 
@@ -289,7 +336,7 @@ function updateQuantity(button, increment) {
 
                 // If the item is selected, update the selection
                 if (checkbox.checked) {
-                    const ItemIndex = selectedItems.findIndex(item => item.id === cartId);
+                    const itemIndex = selectedItems.findIndex(item => item.id === cartId);
                     if (itemIndex !== -1) {
                         selectedItems[itemIndex].quantity = newQuantity;
                     } else {
