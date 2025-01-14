@@ -271,7 +271,7 @@ document.querySelectorAll('.checkout-item').forEach(checkbox => {
     checkbox.addEventListener('change', function () {
         const price = parseFloat(this.dataset.price);
         const quantity = parseInt(this.dataset.quantity, 10);
-        const id = this.dataset.id;
+        const id = this.dataset.cartId;
 
         if (this.checked) {
             // Add the item or update its quantity
@@ -331,7 +331,7 @@ function updateQuantity(button, increment) {
 
                 // Update item total price in the UI
                 const itemTotalPrice = newQuantity * productPrice;
-                const priceElement = button.closest('.card-body').querySelector('.item-total-price');
+                const priceElement = cardBody.querySelector('.item-total-price');
                 priceElement.textContent = `Ksh. ${itemTotalPrice.toFixed(2)}`;
 
                 // If the item is selected, update the selection
