@@ -49,8 +49,6 @@ def add_to_wishlist(product_id):
 
     return jsonify(response)
 
-from flask import request, jsonify
-
 
 @product.route('/update_quantity', methods=['POST'])
 @login_required

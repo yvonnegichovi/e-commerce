@@ -235,10 +235,45 @@
     }
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.checkout-item').forEach((checkbox) => {
+            if (checkbox.checked) {
+                const cardBody = checkbox.closest('.card-body');
+                const quantityInput = cardBody.querySelector('.item-quantity');
+                const cartId = quantityInput.dataset.cartId;
+                const price = parseFloat(cardBody.querySelector('.item-total-price').dataset.price);
+
+                selectedItems.push({
+                    id: cartId,
+                    price: price,
+                    quantity: parseInt(quantityInput.value),
+                });
+            }
+        });
+
+        updateSummary(); // Update the summary initially
+    });
+</script>
+
 
 <script>
 
-const selectedItems = [];
+    const selectedItems = JSON.parse(sessionStorage.getItem('selectedItems')) || [];
+
+// Restore selections on page load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.checkout-item').forEach(checkbox => {
+        const item = selectedItems.find(item => item.id === checkbox.dataset.cartId);
+        if (item) {
+            checkbox.checked = true;
+            const quantityInput = checkbox.closest('.card-body').querySelector('.item-quantity');
+            quantityInput.value = item.quantity;
+        }
+    });
+
+    updateSummary();
+});
 
 function updateSummary() {
     const totalPrice = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -301,21 +336,18 @@ document.querySelectorAll('.checkout-item').forEach(checkbox => {
     <script>
 
 // Update quantity of an item
-function updateQuantity(button, increment) {
+        function updateQuantity(button, increment) {
     const cardBody = button.closest('.card-body');
     const quantityInput = cardBody.querySelector('.item-quantity');
     const cartId = quantityInput.dataset.cartId;
-    const checkbox = button.closest('.card').querySelector('.checkout-item');
 
     let currentQuantity = parseInt(quantityInput.value);
     const newQuantity = currentQuantity + increment;
 
     if (newQuantity <= 0) {
-        quantityInput.value = 1; // Reset to minimum quantity
+        alert("Quantity cannot be zero or negative.");
         return;
     }
-
-    quantityInput.value = newQuantity;
 
     fetch('/update_quantity', {
         method: 'POST',
@@ -324,27 +356,25 @@ function updateQuantity(button, increment) {
     })
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                const productPrice = parseFloat(data.product_price);
-
-                // Update item total price in the UI
-                const itemTotalPrice = newQuantity * productPrice;
-                const priceElement = cardBody.querySelector('.item-total-price');
-                priceElement.textContent = `Ksh. ${itemTotalPrice.toFixed(2)}`;
-
-                // If the item is selected, update the selection
-                if (checkbox.checked) {
-                    const itemIndex = selectedItems.findIndex(item => item.id === cartId);
-                    if (itemIndex !== -1) {
-                        selectedItems[itemIndex].quantity = newQuantity;
-                    } else {
-                        selectedItems.push({ id: cartId, price: productPrice, quantity: newQuantity });
-                    }
+            if (data.success) {
+                const existingItem = selectedItems.find(item => item.id === cartId);
+                if (existingItem) {
+                    existingItem.quantity = newQuantity;
+                } else {
+                    selectedItems.push({
+                        id: cartId,
+                        price: data.product_price,
+                        quantity: newQuantity
+                    });
                 }
-                // Recalculate the summary
-                updateSummary();
+
+                // Save updated selection to sessionStorage
+                sessionStorage.setItem('selectedItems', JSON.stringify(selectedItems));
+
+                // Reload the page
+                window.location.reload();
+            } else {
+                alert(data.error);
             }
         })
         .catch(error => console.error('Error:', error));
