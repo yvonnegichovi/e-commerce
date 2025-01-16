@@ -4,6 +4,7 @@ This file contains notifications, emailing, texting and whatsapp
 
 from dotenv import load_dotenv
 from flask import Blueprint, request, jsonify
+from flask_login import login_user, logout_user, login_required, current_user
 from marshmallow import Schema, fields, ValidationError, validates
 from entry.models import db, Product
 from entry import app
@@ -76,3 +77,51 @@ def create_message():
     # Logic to send message
     return jsonify({'status': 'Message sent'})
 
+@notifications.route('/notifications/share_message', methods=['POST'])
+@login_required
+def share_message():
+    """
+    Route to send a message when sharing.
+    Expects a JSON payload with 'message', 'recipient', 'product_id', and 'platform'.
+    """
+    schema = MessageSchema()
+    try:
+        # Validate and load input data
+        data = schema.load(request.get_json())
+        app.logger.info(f"Validated data: {data}")
+
+        # Retrieve product information
+        product = Product.query.filter_by(id=data['product_id']).first()
+        if not product:
+            return jsonify({'status': 'error', 'message': 'Product not found.'}), 404
+
+        # Prepare the message
+        product_name = product.product_name
+        product_url = f"http://127.0.0.1:5000/product/{product.id}"  # Product URL for the specific product
+        message = f"Checkout this product {product_name} from Zed Beauty. You can check it out here: {product_url} and browse more content from www.zedbeauty.com"
+
+        # Generate share URLs for different platforms
+        platform = data.get('platform', '').lower()
+        share_url = ""
+        if platform == 'whatsapp':
+            share_url = f"https://wa.me/{data['recipient']}?text={message}%20{product_url}"
+        elif platform == 'x':
+            share_url = f"https://twitter.com/intent/tweet?text={message}%20{product_url}"
+        elif platform == 'facebook':
+            share_url = f"https://www.facebook.com/sharer/sharer.php?u={product_url}&quote={message}"
+        elif platform == 'instagram':
+            # Note: Instagram does not support direct sharing via URLs like other platforms
+            share_url = "https://www.instagram.com/"
+        else:
+            return jsonify({'status': 'error', 'message': 'Unsupported platform.'}), 400
+
+        return jsonify({
+            'status': 'success',
+            'message': f'Share link generated for {platform}',
+            'share_url': share_url,
+            'platform': platform
+        }), 200
+
+    except ValidationError as e:
+        app.logger.error(f"Validation error: {e.messages}")
+        return jsonify({'status': 'error', 'message': e.messages}), 400

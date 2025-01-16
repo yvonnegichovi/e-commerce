@@ -139,16 +139,46 @@
 
 
                                 <div class="mt-3">
-                                    <button class="btn btn-primary me-2" onclick="saveForLater({{ product.id }})">Save</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="info col">
-                            <button class="whatsapp-button" onclick="sendWhatsappMessage('{{ product.product_name }}', '{{ product.price }}', '{{ product.product_id }}')">
+                                    <button class="whatsapp-button" onclick="sendWhatsappMessage('{{ product.product_name }}', '{{ product.price }}', '{{ product.product_id }}')">
                                 <img src="{{ url_for('static', filename='images/whatsapp_logo.jpeg') }}" alt="Buy on WhatsApp" style="width: 40px; height: 40px;" />
                                 Buy on WhatsApp
                             </button>
-                            <p class="share">Share<p>
+                            <div class="social-share">
+                                <h6>Share:</h6>
+                                <!-- WhatsApp -->
+                                <a href="#"
+                                   onclick="shareMessage('whatsapp', '{{ product.id }}', '{{ recipient }}')"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <img src="{{ url_for('static', filename='images/whatsapp_logo.jpeg') }}" alt="Share on WhatsApp" width="32" height="32">
+                                </a>
+
+                                <!-- Facebook -->
+                                <a href="#"
+                                   onclick="shareMessage('facebook', '{{ product.id }}', '{{ recipient }}')"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <img src="{{ url_for('static', filename='images/fb-logo.png') }}" alt="Share on Facebook" width="32" height="32">
+                                </a>
+                                <!-- Instagram -->
+                                <a href="#"
+                                   onclick="shareMessage('instagram', '{{ product.id }}', '{{ recipient }}')"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <img src="{{ url_for('static', filename='images/inst-logo.png') }}" alt="Visit Instagram" width="32" height="32">
+                                </a>
+
+                                <!-- Twitter (X) -->
+                                <a href="#"
+                                   onclick="shareMessage('x', '{{ product.id }}', '{{ recipient }}')"
+                                   target="_blank"
+                                   rel="noopener noreferrer">
+                                    <img src="{{ url_for('static', filename='images/x-logo.png') }}" alt="Share on Twitter" width="32" height="32">
+                                </a>
+                            </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -234,6 +264,34 @@
         });
     }
 </script>
+
+    <script>
+        function shareMessage(platform, productId, recipient) {
+    const payload = {
+        product_id: productId,
+        recipient: recipient,
+        platform: platform
+    };
+
+    fetch('/notifications/share_message', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Open the share URL in a new tab
+                window.open(data.share_url, '_blank', 'nonopener, noreferrer');
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}
+    </script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
