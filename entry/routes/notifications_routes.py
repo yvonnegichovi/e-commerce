@@ -77,21 +77,34 @@ def create_message():
     # Logic to send message
     return jsonify({'status': 'Message sent'})
 
+
 @notifications.route('/notifications/share_message', methods=['POST'])
 @login_required
 def share_message():
     """
     Route to send a message when sharing.
-    Expects a JSON payload with 'message', 'recipient', 'product_id', and 'platform'.
+    Expects a JSON payload with 'message', 'recipient' (for WhatsApp), 'product_id', and 'platform'.
     """
-    schema = MessageSchema()
     try:
-        # Validate and load input data
-        data = schema.load(request.get_json())
-        app.logger.info(f"Validated data: {data}")
+        # Parse incoming JSON data
+        data = request.get_json()
+        app.logger.info(f"Received payload: {data}")
+
+        # Validate common fields
+        product_id = data.get('product_id')
+        platform = data.get('platform', '').lower()
+
+        if not product_id:
+            return jsonify({'status': 'error', 'message': 'Missing product_id.'}), 400
+        product_id = int(product_id)
+        if not isinstance(product_id, int):
+            return jsonify({'status': 'error', 'message': 'Invalid product_id.'}), 400
+
+        if not platform:
+            return jsonify({'status': 'error', 'message': 'Platform is required.'}), 400
 
         # Retrieve product information
-        product = Product.query.filter_by(id=data['product_id']).first()
+        product = Product.query.filter_by(id=product_id).first()
         if not product:
             return jsonify({'status': 'error', 'message': 'Product not found.'}), 404
 
@@ -100,17 +113,22 @@ def share_message():
         product_url = f"http://127.0.0.1:5000/product/{product.id}"  # Product URL for the specific product
         message = f"Checkout this product {product_name} from Zed Beauty. You can check it out here: {product_url} and browse more content from www.zedbeauty.com"
 
-        # Generate share URLs for different platforms
-        platform = data.get('platform', '').lower()
+        # Handle platform-specific logic
         share_url = ""
         if platform == 'whatsapp':
-            share_url = f"https://wa.me/{data['recipient']}?text={message}%20{product_url}"
+            recipient = data.get('recipient', '').strip()
+            if recipient:
+                # If recipient is provided, generate a share link for the recipient
+                share_url = f"https://wa.me/{recipient}?text={message}"
+            else:
+                # If no recipient is provided, generate a generic WhatsApp share link
+                share_url = f"https://api.whatsapp.com/send?text={message}"
         elif platform == 'x':
-            share_url = f"https://twitter.com/intent/tweet?text={message}%20{product_url}"
+            share_url = f"https://twitter.com/intent/tweet?text={message}"
         elif platform == 'facebook':
             share_url = f"https://www.facebook.com/sharer/sharer.php?u={product_url}&quote={message}"
         elif platform == 'instagram':
-            # Note: Instagram does not support direct sharing via URLs like other platforms
+            # Instagram does not support direct sharing; link to Instagram
             share_url = "https://www.instagram.com/"
         else:
             return jsonify({'status': 'error', 'message': 'Unsupported platform.'}), 400
@@ -122,6 +140,7 @@ def share_message():
             'platform': platform
         }), 200
 
-    except ValidationError as e:
-        app.logger.error(f"Validation error: {e.messages}")
-        return jsonify({'status': 'error', 'message': e.messages}), 400
+    except Exception as e:
+        app.logger.error(f"Error in share_message: {str(e)}")
+        return jsonify({'status': 'error', 'message': 'An unexpected error occurred.'}), 500
+

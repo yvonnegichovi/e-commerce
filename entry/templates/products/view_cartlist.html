@@ -150,7 +150,7 @@
                                    onclick="shareMessage('whatsapp', '{{ product.id }}', '{{ recipient }}')"
                                    target="_blank"
                                    rel="noopener noreferrer">
-                                    <img src="{{ url_for('static', filename='images/whatsapp_logo.jpeg') }}" alt="Share on WhatsApp" width="32" height="32">
+                                    <img src="{{ url_for('static', filename='images/whatsapp_logo.jpeg') }}" alt="Share on WhatsApp" width="34" height="34">
                                 </a>
 
                                 <!-- Facebook -->
@@ -270,7 +270,8 @@
     const payload = {
         product_id: productId,
         recipient: recipient,
-        platform: platform
+        platform: platform,
+        message: `Check out this product on Zed Beauty!`
     };
 
     fetch('/notifications/share_message', {
