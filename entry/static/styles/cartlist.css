@@ -40,6 +40,34 @@ body {
     padding: 20px;
 }
 
+.hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.popup-content {
+    text-align: center;
+}
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+
 h2 {
     font-size: 2rem;
     margin-bottom: 20px;

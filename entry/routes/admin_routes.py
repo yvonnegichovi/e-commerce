@@ -156,7 +156,6 @@ def add_product():
             category_id=category_id,
             price=price,
             stock=stock,
-            status='unordered',
             image=image_url,  # Store image filename in the database
             is_starred=is_starred
         )

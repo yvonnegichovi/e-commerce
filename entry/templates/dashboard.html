@@ -23,7 +23,10 @@
                         <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('product.dashboard') }}">Dashboard</a>
+                        <a class="nav-link active" href="{{ url_for('product.view_cartlist', user_id=current_user.id) }}">Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('product.view_wishlist', user_id=current_user.id) }}">Wishlist</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
