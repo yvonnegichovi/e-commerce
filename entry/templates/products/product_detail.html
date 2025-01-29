@@ -44,6 +44,9 @@ body {
 
     <!-- Product Detail Section -->
     <div class="container">
+
+        {% include 'messages.html' %}
+
         <h2 class="text-center">{{ product.product_name }}</h2>
 
         <div class="row">
@@ -67,11 +70,13 @@ body {
                 <button class="btn btn-primary" id="addToWishlistButton" data-product-id="{{ product.id }}">
                     Add to Wishlist
                 </button>
+                {% include 'messages.html' %}
             </div>
         </div>
     </div>
     <!-- Delivery Location Section -->
     <div class="container_two mt-2">
+        {% include 'messages.html' %}
         <h4 class="delivery_info">Delivery & Returns</h4>
         <p>Choose your location</p>
     </div>

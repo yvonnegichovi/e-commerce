@@ -23,7 +23,6 @@ def register():
             phone=form.phone.data,
             password_hash=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         )
-        print('new account created')
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
@@ -40,11 +39,9 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
-            print("Login successful")
             flash('Logged in successfully', 'success')
             return redirect(url_for('product.dashboard'))
         else:
-            print("COULD NOT LOGIN FOR SOME REASON")
             flash('Invalid email or password', 'danger')
     return render_template('login.html', title='Login', form=form)
 

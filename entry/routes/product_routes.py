@@ -16,6 +16,7 @@ def dashboard():
     """ Fetches information for the dashboard """
     products = Product.query.all()
     starred_products = Product.query.filter_by(is_starred=True).all()
+    flash("You are now in the dashboard. Yeeeeih!!!", "success")
 
     return render_template('dashboard.html', products=products, starred_products=starred_products)
 
@@ -109,18 +110,11 @@ def add_to_cart(product_id):
     Adds a product into the cart
     """
     product = Product.query.get_or_404(product_id)
-    print(f"the selected product is {product.product_name}")
 
     data = request.get_json()
     quantity = int(data.get('quantity', 0))
-    print(request.form)
-    print(f"Request method: {request.method}")
-    print(f"Form data: {request.form}")
-    print("IT IS NOW POSSIBLE TO ADD")
 
     if quantity is None or quantity <= 0:
-        print(f"The quantity is {quantity}")
-        print(f"Please provide a valid quantity for {product.product_name}, the code breaks here")
         flash("Please provide a valid quantity!", "danger")
 
     existing_entry = CartList.query.filter_by(user_id=current_user.id, product_id=product_id).first()
@@ -128,21 +122,17 @@ def add_to_cart(product_id):
     if existing_entry:
         existing_entry.quantity += quantity
         db.session.commit()
-        print(f"Just updated the quantity of {product.product_name} in the current users cart")
         flash(f"Updated the quantity of '{product.product_name}' in your cart!", "success")
+        return redirect(url_for('product.product_detail', product_id=product_id))
     else:
         cart_item=CartList(user_id=current_user.id, product_id=product_id, quantity=quantity)
         db.session.add(cart_item)
         db.session.commit()
-        print("Just successfully added this item to the user's cart for the first time")
         flash("Product successfully added to your Cart!", "success")
+        return redirect(url_for('product.product_detail', product_id=product_id))
 
-    # After adding to cart, return a JSON response indicating success
-    return jsonify({
-        'message': "Product added to cart!",
-        'product_id': product_id,
-        'quantity': quantity
-    })
+    return redirect(url_for('product.product_detail', product_id=product_id))
+
 
 @product.route('/cart/<user_id>', methods=['GET'])
 @login_required
