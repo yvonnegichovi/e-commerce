@@ -107,7 +107,7 @@
                                 <!-- Remove Button -->
                                 <button
                                     class="remove-button"
-                                    data-cart-id="{{ product.cart_id }}"
+                                    data-cart-id="{{ product.id }}"
                                     data-product-id="{{ product.product_id }}">
                                     Remove
                                 </button>
@@ -120,7 +120,7 @@
                                     inert>
                                     <div class="popup-content">
                                         <h2 id="popup-title">Confirm Action</h2>
-                                        <p>Are you sure you want to delete thsi item?</p>
+                                        <p>Are you sure you want to delete this item?</p>
                                         <button id="confirm-remove">Remove</button>
                                         <button id="add-to-wishlist">Save</button>
                                         <button id="close-popup">Cancel</button>
@@ -259,17 +259,26 @@
             // Remove from cart
             const removeFromCart = async (cartId) => {
                 try {
+                    console.log("Removing cart item with ID:", cartId); // Debugging line
                     const response = await fetch(`/cartlist/remove/${cartId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                     });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
                     const data = await response.json();
+                    console.log("Server Response:", data); // Debugging line
+
                     alert(data.status || data.error);
                     hidePopup();
                     if (data.status === 'success') {
                         document.querySelector(`[data-cart-id="${cartId}"]`).closest('.cart-item').remove();
+                        location.reload();
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -298,8 +307,17 @@
             // Event listeners
             document.querySelectorAll('.remove-button').forEach((button) => {
                 button.addEventListener('click', (event) => {
-                    const cartId = event.target.getAttribute('data-cart-id');
-                    const productId = event.target.getAttribute('data-product-id');
+                    const cartId = event.currentTarget.dataset.cartId;
+                    const productId = event.currentTarget.dataset.productId;
+
+                    console.log("🛒 Cart ID:", cartId);  // Debugging
+                    console.log("📦 Product ID:", productId);
+
+                    if (!cartId) {
+                        console.error("Cart ID id missing!");
+                        return;
+                    }
+
                     showPopup(cartId, productId);
                 });
             });

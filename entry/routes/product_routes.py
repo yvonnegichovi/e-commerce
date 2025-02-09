@@ -157,13 +157,15 @@ def remove_from_cart(cart_id):
     Removes an item from the cart by its ID
     """
     print("YOU CAN NOW DELETE ITEMS")
-    cart_item = CartList.query.filter_by(id=cart_id).first()
-    if cart_item:
+    try:
+        cart_item = CartList.query.filter_by(id=cart_id).first()
+        if not cart_item:
+            return jsonify({'status': 'error', 'message': 'Item not found'}), 404
         db.session.delete(cart_item)
         db.session.commit()
         return jsonify({"status": "success"}), 200
-    else:
-        return jsonify({"error": "Item not found"}), 404
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': 'Failed to remove item', 'error': str(e)}), 500
 
 
 @product.route('/categories/<int:category_id>')
